@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #87CEEB; /* Azul céu */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            flex-direction: column;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .main-container {
+            position: relative;
+            width: 800px;
+            height: 650px;
+            background-color: #70c5ce;
+            border: 5px solid #000;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #hub-page {
+            gap: 30px;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
+        #hub-page h1 {
+            font-size: 3em;
+            color: #FFD700;
+            text-shadow: 4px 4px 0 #000;
+            position: absolute;
+            top: 20px;
+        }
+        
+        .game-card {
+            font-family: 'Press Start 2P', cursive;
+            width: 250px;
+            height: 350px;
+            background-color: #FFD700;
+            border-radius: 15px;
+            border: 3px solid #000;
+            box-shadow: 0 8px 0 #b8860b;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none; /* Remove sublinhado do link */
+            color: inherit; /* Mantém a cor do texto do pai */
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 0 #b8860b;
+        }
+
+        .game-card:active {
+            transform: translateY(3px);
+            box-shadow: 0 4px 0 #b8860b;
+        }
+        
+        .game-card h2 {
+            font-size: 1.5em;
+            color: #000;
+            text-shadow: 1px 1px 0 #fff;
+            margin: 10px 0;
+        }
+
+        .game-card p {
+            font-size: 0.8em;
+            color: #333;
+            padding: 0 15px;
+            margin: 0;
+        }
+
+        .game-icon {
+            font-size: 6em;
+            color: #228B22;
+            margin-bottom: 10px;
+            -webkit-text-stroke: 2px #000;
+            filter: drop-shadow(4px 4px 0 #000);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Hub Page -->
+        <div id="hub-page">
+            <h1>Game Hub</h1>
+            <a href="snake.html" class="game-card">
+                <span class="game-icon">🐍</span>
+                <h2>Snake 2-Player</h2>
+                <p>Jogue o clássico jogo da cobrinha contra um amigo!</p>
+            </a>
+            <a href="flap.html" class="game-card">
+                <span class="game-icon">🐦</span>
+                <h2>Flappy Bird</h2>
+                <p>Controle o pássaro e desvie dos canos para fazer a maior pontuação.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
