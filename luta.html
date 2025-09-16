@@ -10,14 +10,22 @@
     <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.js"></script>
     <style>
         :root {
-            --player1-color: #00aaff;
-            --player2-color: #ff3300;
+            --player1-color: #ff3300;
+            --player2-color: #00aaff;
+            --body-color: #f1c27d;
+            --p1-trunk-color: #2980b9;
+            --p2-trunk-color: #9b59b6;
+            --p1-pants-color: #2ecc71;
+            --p2-pants-color: #f39c12;
             --punch-color: #ffff00;
             --kick-color: #ff9900;
             --fireball-color: #ff0000;
             --stamina-color: #33ff33;
             --bg-color: #1a1a1a;
             --ui-color: #e5e7eb;
+            --button-start-color: #ffcc00;
+            --button-end-color: #ffaa00;
+            --button-text-color: #000;
         }
 
         body {
@@ -103,6 +111,13 @@
             align-items: flex-start;
         }
         .player-info.p2 { align-items: flex-end; }
+        
+        .player-name {
+            font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+            margin-bottom: 5px;
+            text-shadow: 1px 1px #000;
+        }
+        .player-name.p2 { text-align: right; }
 
         #timer {
             font-size: clamp(1rem, 2vw, 1.2rem);
@@ -154,11 +169,12 @@
             }
         }
         
-        .message-container h2 {
-            font-size: clamp(1.5rem, 4vw, 3rem);
-            margin-bottom: 15px;
-            color: #fca5a5;
-            text-shadow: 2px 2px #4b5563;
+        .home-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 3px 3px 0 #8b0000, 
+                         6px 6px 0 #ffa500;
         }
 
         .message-container .subtitle {
@@ -198,6 +214,11 @@
             color: #fca5a5;
             text-shadow: 1px 1px #000;
         }
+        
+        .message-container .fatality-key {
+             color: #ff0000;
+             font-weight: bold;
+        }
 
         .button-group {
             display: flex;
@@ -207,18 +228,49 @@
             width: 100%;
         }
 
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            background-color: #374151;
+            border: 2px solid #6b7280;
+            border-radius: 5px;
+            color: var(--ui-color);
+            font-family: 'Press Start 2P', cursive;
+            padding: 8px;
+            font-size: clamp(0.7rem, 1.5vw, 1rem);
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
         .message-container button {
-            background-color: #ffcc00;
-            color: black;
-            border: 3px solid black;
+            background: linear-gradient(180deg, var(--button-start-color), var(--button-end-color));
+            color: var(--button-text-color);
+            border: 3px solid #000;
             padding: 12px 25px;
             font-family: 'Press Start 2P', cursive;
             border-radius: 8px;
             cursor: pointer;
             font-size: clamp(0.9rem, 2vw, 1.2rem);
-            box-shadow: 0 6px #ffaa00;
+            box-shadow: 0 6px 0 #8b0000, 0 8px 10px rgba(0,0,0,0.5);
             transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
             flex: 1;
+        }
+        
+        #controlsButton, #backToHomeFromControls {
+             background: #4b5563;
+             box-shadow: 0 6px 0 #2d3748, 0 8px 10px rgba(0,0,0,0.5);
+             color: var(--ui-color);
+             border-color: #000;
+        }
+        
+        #controlsButton:active, #backToHomeFromControls:active {
+            box-shadow: 0 2px 0 #2d3748;
         }
 
         @media (min-width: 768px) {
@@ -228,13 +280,14 @@
         }
         
         .message-container button:hover {
-            box-shadow: 0 4px #ffaa00;
+            box-shadow: 0 4px 0 #8b0000, 0 6px 8px rgba(0,0,0,0.5);
         }
-
+        
         .message-container button:active {
             transform: translateY(2px);
-            box-shadow: 0 2px #ffaa00;
+            box-shadow: 0 2px 0 #8b0000;
         }
+
         #finishHim {
             position: absolute;
             top: 30%;
@@ -263,8 +316,19 @@
     <div id="finishHim">FATALITY!</div>
     <div id="messageBox" class="message-container">
         <div id="homeScreenContent">
-            <h2>Mortal Kombat</h2>
-            <p class="subtitle">Aperte o botão para começar!</p>
+            <h2 class="home-title">MORTAL KOMBAT</h2>
+            <p class="subtitle">Insira o nome dos jogadores:</p>
+            <div class="input-group">
+                <input type="text" id="player1NameInput" placeholder="JOGADOR 1" maxlength="10">
+                <input type="text" id="player2NameInput" placeholder="JOGADOR 2" maxlength="10">
+            </div>
+            <div class="button-group">
+                <button id="mainButton">Começar</button>
+                <button id="controlsButton">Controles</button>
+            </div>
+        </div>
+        <div id="controlsScreenContent" style="display: none;">
+            <h2 class="home-title" style="text-shadow: 2px 2px #4b5563;">Controles</h2>
             <div class="controls">
                 <div class="player-controls">
                     <p>• Jogador 1:</p>
@@ -272,7 +336,7 @@
                     <p>Pular: <span class="key">W</span></p>
                     <p>Bloquear: <span class="key">S</span></p>
                     <p>Ataques: <span class="key">Q</span> (soco), <span class="key">E</span> (chute)</p>
-                    <p>Fatality: <span class="key">X</span> (executa uma animação de finalização)</p>
+                    <p>Golpe Especial: <span class="fatality-key">X</span></p>
                 </div>
                 <div class="player-controls">
                     <p>• Jogador 2:</p>
@@ -280,15 +344,15 @@
                     <p>Pular: <span class="key">Seta para Cima</span></p>
                     <p>Bloquear: <span class="key">Seta para Baixo</span></p>
                     <p>Ataques: <span class="key">K</span> (soco), <span class="key">L</span> (chute)</p>
-                    <p>Fatality: <span class="key">I</span> (executa uma animação de finalização)</p>
+                    <p>Golpe Especial: <span class="fatality-key">I</span></p>
                 </div>
             </div>
             <div class="button-group">
-                <button id="mainButton">Começar</button>
+                <button id="backToHomeFromControls">Voltar</button>
             </div>
         </div>
         <div id="endGameContent" style="display: none;">
-            <h2 id="endGameTitle"></h2>
+            <h2 class="home-title" id="endGameTitle"></h2>
             <div class="button-group">
                 <button id="playAgainButton">Jogar Novamente</button>
                 <button id="backToHomeButton">Voltar para Início</button>
@@ -299,6 +363,7 @@
     <div class="game-container" style="display:none;">
         <div class="ui-container">
             <div class="player-info">
+                <div class="player-name" id="player1Name"></div>
                 <div class="health-bar-container p1">
                     <div id="player1HealthBar"></div>
                 </div>
@@ -308,6 +373,7 @@
             </div>
             <div id="timer"></div>
             <div class="player-info p2">
+                <div class="player-name p2" id="player2Name"></div>
                 <div class="health-bar-container">
                     <div id="player2HealthBar"></div>
                 </div>
@@ -315,7 +381,7 @@
                     <div id="player2StaminaBar"></div>
                 </div>
             </div>
-        </div>
+            </div>
         <canvas id="gameCanvas"></canvas>
     </div>
 
@@ -324,10 +390,13 @@
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             const homeScreenContent = document.getElementById('homeScreenContent');
+            const controlsScreenContent = document.getElementById('controlsScreenContent');
             const endGameContent = document.getElementById('endGameContent');
             const mainButton = document.getElementById('mainButton');
+            const controlsButton = document.getElementById('controlsButton');
             const playAgainButton = document.getElementById('playAgainButton');
             const backToHomeButton = document.getElementById('backToHomeButton');
+            const backToHomeFromControls = document.getElementById('backToHomeFromControls');
             const endGameTitle = document.getElementById('endGameTitle');
             const messageBox = document.getElementById('messageBox');
             const gameContainer = document.querySelector('.game-container');
@@ -335,6 +404,10 @@
             const player2HealthBar = document.getElementById('player2HealthBar');
             const player1StaminaBar = document.getElementById('player1StaminaBar');
             const player2StaminaBar = document.getElementById('player2StaminaBar');
+            const player1NameInput = document.getElementById('player1NameInput');
+            const player2NameInput = document.getElementById('player2NameInput');
+            const player1NameDisplay = document.getElementById('player1Name');
+            const player2NameDisplay = document.getElementById('player2Name');
             const timerDisplay = document.getElementById('timer');
             const finishHimDisplay = document.getElementById('finishHim');
 
@@ -405,12 +478,16 @@
 
             // Player class
             class Player {
-                constructor({ x, y, color, keysConfig, direction }) {
+                constructor({ x, y, playerColor, keysConfig, direction, trunkColor, pantsColor, name }) {
                     this.x = x;
                     this.y = y;
-                    this.width = 40;
-                    this.height = 80;
-                    this.color = color;
+                    this.width = 60; // Tamanho ajustado para proporções melhores
+                    this.height = 120;
+                    this.playerColor = playerColor;
+                    this.trunkColor = trunkColor;
+                    this.pantsColor = pantsColor;
+                    this.bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color');
+                    this.name = name;
                     this.health = 100;
                     this.stamina = 100;
                     this.maxStamina = 100;
@@ -428,50 +505,69 @@
                 }
 
                 draw() {
-                    // Only draw the player if they are not dead or in fatality animation
                     if (this.isDead && fatalityAnimationActive) {
                         return;
                     }
-
-                    let bodyColor = this.color;
-                    ctx.fillStyle = bodyColor;
                     
-                    // Main body
-                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    // Draw player name above the head
+                    ctx.fillStyle = this.playerColor;
+                    ctx.font = "12px 'Press Start 2P', cursive";
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.name, this.x + this.width / 2, this.y - 10);
+                    
+                    // Base x position for drawing, adjusted for direction
+                    const baseX = this.direction === 'right' ? this.x : this.x + this.width;
+                    const xScale = this.direction === 'right' ? 1 : -1;
+
+                    ctx.save();
+                    ctx.translate(baseX, this.y);
+                    ctx.scale(xScale, 1);
 
                     // Head
-                    if (!this.isDead) { // Don't draw head if player is dead
+                    if (!this.isDead) {
                         ctx.beginPath();
-                        ctx.arc(this.x + this.width / 2, this.y - 15, 15, 0, Math.PI * 2);
-                        ctx.fillStyle = this.isBlocking ? '#666' : bodyColor;
+                        ctx.arc(this.width / 2, 20, 15, 0, Math.PI * 2);
+                        ctx.fillStyle = this.bodyColor;
                         ctx.fill();
                     }
 
-                    // Arms and legs
-                    ctx.fillStyle = bodyColor;
-                    // Draw limbs, but not if they are part of an attack animation
-                    if (!this.isPunching) {
-                        ctx.fillRect(this.x, this.y + 20, 10, 30); // Left arm
-                        ctx.fillRect(this.x + this.width - 10, this.y + 20, 10, 30); // Right arm
-                    }
-                    if (!this.isKicking) {
-                        ctx.fillRect(this.x + 5, this.y + this.height - 20, 15, 20); // Left leg
-                        ctx.fillRect(this.x + this.width - 20, this.y + this.height - 20, 15, 20); // Right leg
+                    // Trunk
+                    ctx.fillStyle = this.trunkColor;
+                    ctx.fillRect(this.width / 4, 30, this.width / 2, this.height * 0.4);
+
+                    // Arms
+                    ctx.fillStyle = this.bodyColor;
+                    
+                    if (this.isPunching) {
+                        // Braço de soco
+                        ctx.fillRect(this.width / 4 + 10, this.height * 0.3, this.width * 0.8, 10);
+                        // Braço de trás
+                        ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
+                    } else {
+                        // Braços normais
+                        ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
+                        ctx.fillRect(this.width * 0.75 - 10, this.height * 0.3, 10, this.height * 0.3);
                     }
 
-                    // Punch animation
-                    if (this.isPunching) {
-                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--punch-color');
-                        const punchX = this.direction === 'right' ? this.x + this.width : this.x - 20;
-                        ctx.fillRect(punchX, this.y + 25, 20, 10);
-                    }
-                    // Kick animation
+                    // Legs
+                    ctx.fillStyle = this.pantsColor;
+                    
                     if (this.isKicking) {
-                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--kick-color');
-                        const kickX = this.direction === 'right' ? this.x + this.width : this.x - 30;
-                        const kickY = this.y + this.height - 15;
-                        ctx.fillRect(kickX, kickY, 30, 15);
+                        // Perna de chute
+                        ctx.save();
+                        ctx.translate(this.width * 0.5, this.height * 0.7 + 10);
+                        ctx.rotate(Math.PI / 4 * 1.5);
+                        ctx.fillRect(-5, -5, 10, this.height * 0.6);
+                        ctx.restore();
+                        // Perna de apoio
+                        ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
+                    } else {
+                         // Pernas normais
+                        ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
+                        ctx.fillRect(this.width * 0.75 - 10, this.height * 0.7, 10, this.height * 0.3);
                     }
+                    
+                    ctx.restore();
                 }
 
                 update() {
@@ -557,7 +653,7 @@
                             this.isAttacking = false;
                             this.isPunching = false;
                         }, 200);
-                        return { damage: 10, range: 40, yOffset: 25, height: 10, width: 20 };
+                        return { damage: 10, range: 40, yOffset: 60, height: 10, width: 40 };
                     }
                     return null;
                 }
@@ -572,7 +668,7 @@
                             this.isAttacking = false;
                             this.isKicking = false;
                         }, 200);
-                        return { damage: 15, range: 60, yOffset: this.height - 15, height: 15, width: 30 };
+                        return { damage: 15, range: 60, yOffset: 120, height: 15, width: 80 };
                     }
                     return null;
                 }
@@ -627,7 +723,7 @@
                 constructor({ x, y, color, velocityX, velocityY }) {
                     this.x = x;
                     this.y = y;
-                    this.size = 15;
+                    this.size = 20;
                     this.color = color;
                     this.velocity = { x: velocityX, y: velocityY };
                 }
@@ -651,30 +747,48 @@
                 }
             }
 
-
             let player1, player2;
 
             function initGame() {
+                // Checa se os nomes dos jogadores foram inseridos
+                const p1Name = player1NameInput.value.trim() || 'JOGADOR 1';
+                const p2Name = player2NameInput.value.trim() || 'JOGADOR 2';
+
+                if (!p1Name || !p2Name) {
+                    // Se algum nome estiver faltando, não inicia o jogo e retorna
+                    return;
+                }
+
                 if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
                 if (timerId) { clearInterval(timerId); }
 
-                messageBox.style.display = 'none'; // This line was added
+                player1NameDisplay.innerText = p1Name;
+                player2NameDisplay.innerText = p2Name;
+
+                messageBox.style.display = 'none';
                 homeScreenContent.style.display = 'none';
+                controlsScreenContent.style.display = 'none';
                 endGameContent.style.display = 'none';
                 gameContainer.style.display = 'flex';
                 finishHimDisplay.style.display = 'none';
                 
                 player1 = new Player({
-                    x: 100, y: groundY - 80, 
-                    color: getComputedStyle(document.documentElement).getPropertyValue('--player1-color'),
+                    x: 100, y: groundY - 120,
+                    playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player1-color'),
+                    trunkColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-trunk-color'),
+                    pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-pants-color'),
                     keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'z' },
-                    direction: 'right'
+                    direction: 'right',
+                    name: p1Name
                 });
                 player2 = new Player({
-                    x: canvasWidth - 140, y: groundY - 80, 
-                    color: getComputedStyle(document.documentElement).getPropertyValue('--player2-color'),
+                    x: canvasWidth - 140, y: groundY - 120,
+                    playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player2-color'),
+                    trunkColor: getComputedStyle(document.documentElement).getPropertyValue('--p2-trunk-color'),
+                    pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p2-pants-color'),
                     keysConfig: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', block: 'ArrowDown', punch: 'k', kick: 'l', fireball: 'j' },
-                    direction: 'left'
+                    direction: 'left',
+                    name: p2Name
                 });
 
                 gameStarted = true;
@@ -703,6 +817,7 @@
                 finishHimDisplay.style.display = 'none';
                 
                 homeScreenContent.style.display = 'none';
+                controlsScreenContent.style.display = 'none';
                 endGameContent.style.display = 'block';
 
                 endGameTitle.innerText = winner ? `${winner} Venceu!` : 'Empate!';
@@ -725,8 +840,14 @@
                 gameContainer.style.display = 'none';
                 finishHimDisplay.style.display = 'none';
                 
+                controlsScreenContent.style.display = 'none';
                 endGameContent.style.display = 'none';
                 homeScreenContent.style.display = 'block';
+            }
+            
+            function showControlsScreen() {
+                homeScreenContent.style.display = 'none';
+                controlsScreenContent.style.display = 'block';
             }
 
             function updateHealthBars() {
@@ -767,8 +888,8 @@
                     if (animationStep === headDetachStep && detachedHead === null) {
                         detachedHead = new Head({
                             x: loser.x + loser.width / 2,
-                            y: loser.y - 15,
-                            color: loser.color,
+                            y: loser.y + 20,
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--body-color'),
                             velocityX: loser.direction === 'right' ? 3 : -3,
                             velocityY: -5
                         });
@@ -782,11 +903,8 @@
                     loser.health = 0;
                     // End the game after a small delay to let the animation finish
                     fatalityTimeoutId = setTimeout(() => {
-                        if (winner === player1) {
-                            endGame('Jogador 1');
-                        } else {
-                            endGame('Jogador 2');
-                        }
+                        const winnerName = winner === player1 ? player1.name : player2.name;
+                        endGame(winnerName);
                     }, 2500); // 2.5 seconds delay
                 }
             }
@@ -839,6 +957,7 @@
                     
                     // Check attack collision
                     const checkCollision = (attacker, defender, attack) => {
+                        // Calcula a posição de ataque com base na direção do atacante
                         const attackX = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x - attack.width;
                         const attackY = attacker.y + attack.yOffset;
                         if (
@@ -908,8 +1027,8 @@
                     fatalitySynth.triggerAttackRelease("C4", "1s");
                 }
 
-                if (player1.health <= 0 && !fatalityAnimationActive) { endGame('Jogador 2'); }
-                if (player2.health <= 0 && !fatalityAnimationActive) { endGame('Jogador 1'); }
+                if (player1.health <= 0 && !fatalityAnimationActive) { endGame(player2.name); }
+                if (player2.health <= 0 && !fatalityAnimationActive) { endGame(player1.name); }
                 
                 animationFrameId = requestAnimationFrame(animate);
             }
@@ -947,6 +1066,8 @@
 
             // Set up initial and end game button handlers
             mainButton.addEventListener('click', initGame);
+            controlsButton.addEventListener('click', showControlsScreen);
+            backToHomeFromControls.addEventListener('click', showHomeScreen);
             playAgainButton.addEventListener('click', initGame);
             backToHomeButton.addEventListener('click', showHomeScreen);
             
