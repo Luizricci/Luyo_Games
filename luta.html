@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Mortal Kombat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.js"></script>
+    <style>
+        :root {
+            --player1-color: #00aaff;
+            --player2-color: #ff3300;
+            --punch-color: #ffff00;
+            --kick-color: #ff9900;
+            --fireball-color: #ff0000;
+            --stamina-color: #33ff33;
+            --bg-color: #1a1a1a;
+            --ui-color: #e5e7eb;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #252525;
+            color: var(--ui-color);
+            font-family: 'Press Start 2P', cursive;
+            padding: 10px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: var(--bg-color);
+            border: 5px solid #000;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+            max-width: 90%;
+            width: 800px;
+            box-sizing: content-box;
+        }
+        @media (max-width: 850px) {
+            .game-container {
+                width: 95%;
+            }
+        }
+
+        .ui-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            margin-bottom: 5px;
+        }
+
+        .health-bar-container, .stamina-bar-container {
+            width: 45%;
+            height: 25px;
+            background-color: #4b5563;
+            border: 2px solid #9ca3af;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stamina-bar-container {
+            height: 12px;
+            border-color: var(--stamina-color);
+            margin-top: 5px;
+        }
+
+        #player1HealthBar, #player2HealthBar, #player1StaminaBar, #player2StaminaBar {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #player1HealthBar { background-color: var(--player1-color); }
+        #player2HealthBar { background-color: var(--player2-color); left: auto; right: 0; }
+        #player1StaminaBar { background-color: var(--stamina-color); }
+        #player2StaminaBar { background-color: var(--stamina-color); left: auto; right: 0; }
+
+        .health-bar-container.p1, .stamina-bar-container.p1 { transform: scaleX(-1); }
+        .health-bar-container.p1 #player1HealthBar, .stamina-bar-container.p1 #player1StaminaBar { transform: scaleX(-1); }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            width: 45%;
+            align-items: flex-start;
+        }
+        .player-info.p2 { align-items: flex-end; }
+
+        #timer {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--ui-color);
+            text-shadow: 1px 1px #000;
+            width: 80px;
+            text-align: center;
+        }
+
+        #gameCanvas {
+            background-image: url('https://placehold.co/800x450/111/444?text=Arena+MK');
+            background-size: cover;
+            border: 4px solid #4b5563;
+            border-radius: 8px;
+            touch-action: none;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+        }
+        
+        .message-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2d3748;
+            padding: 30px; 
+            border-radius: 12px;
+            border: 5px solid black;
+            z-index: 10;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            max-width: 600px;
+            width: 90%;
+            max-height: 95vh;
+            overflow-y: auto; 
+            animation: fadeIn 0.5s ease-in-out;
+            color: var(--ui-color);
+            font-size: 14px;
+        }
+        
+        @media (min-width: 768px) {
+            .message-container {
+                max-width: 800px;
+            }
+            .message-container .controls {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+        }
+        
+        .message-container h2 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 15px;
+            color: #fca5a5;
+            text-shadow: 2px 2px #4b5563;
+        }
+
+        .message-container .subtitle {
+            font-size: clamp(0.9rem, 2vw, 1.5rem);
+            color: #cbd5e1;
+            margin-bottom: 20px; 
+            text-shadow: 1px 1px #000;
+        }
+        
+        .message-container p {
+            font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+            margin-bottom: 10px; 
+            color: #e5e7eb;
+            line-height: 1.5;
+            text-shadow: 1px 1px #000;
+        }
+
+        .message-container .controls {
+            margin-top: 20px; 
+            text-align: left;
+            padding: 0 10px;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message-container .controls .player-controls {
+            background-color: #4b5563;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #6b7280;
+            flex: 1;
+        }
+        
+        .message-container .key {
+            color: #fca5a5;
+            text-shadow: 1px 1px #000;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .message-container button {
+            background-color: #ffcc00;
+            color: black;
+            border: 3px solid black;
+            padding: 12px 25px;
+            font-family: 'Press Start 2P', cursive;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            box-shadow: 0 6px #ffaa00;
+            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+            flex: 1;
+        }
+
+        @media (min-width: 768px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+        
+        .message-container button:hover {
+            box-shadow: 0 4px #ffaa00;
+        }
+
+        .message-container button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #ffaa00;
+        }
+        #finishHim {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: #ff0000;
+            text-shadow: 3px 3px #000;
+            animation: pulse 1s infinite;
+            display: none;
+            z-index: 10;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div id="finishHim">FATALITY!</div>
+    <div id="messageBox" class="message-container">
+        <div id="homeScreenContent">
+            <h2>Mortal Kombat</h2>
+            <p class="subtitle">Aperte o botão para começar!</p>
+            <div class="controls">
+                <div class="player-controls">
+                    <p>• Jogador 1:</p>
+                    <p>Mover: <span class="key">A, D</span></p>
+                    <p>Pular: <span class="key">W</span></p>
+                    <p>Bloquear: <span class="key">S</span></p>
+                    <p>Ataques: <span class="key">Q</span> (soco), <span class="key">E</span> (chute)</p>
+                    <p>Fatality: <span class="key">X</span> (executa uma animação de finalização)</p>
+                </div>
+                <div class="player-controls">
+                    <p>• Jogador 2:</p>
+                    <p>Mover: <span class="key">Setas Direcionais</span></p>
+                    <p>Pular: <span class="key">Seta para Cima</span></p>
+                    <p>Bloquear: <span class="key">Seta para Baixo</span></p>
+                    <p>Ataques: <span class="key">K</span> (soco), <span class="key">L</span> (chute)</p>
+                    <p>Fatality: <span class="key">I</span> (executa uma animação de finalização)</p>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="mainButton">Começar</button>
+            </div>
+        </div>
+        <div id="endGameContent" style="display: none;">
+            <h2 id="endGameTitle"></h2>
+            <div class="button-group">
+                <button id="playAgainButton">Jogar Novamente</button>
+                <button id="backToHomeButton">Voltar para Início</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container" style="display:none;">
+        <div class="ui-container">
+            <div class="player-info">
+                <div class="health-bar-container p1">
+                    <div id="player1HealthBar"></div>
+                </div>
+                <div class="stamina-bar-container p1">
+                    <div id="player1StaminaBar"></div>
+                </div>
+            </div>
+            <div id="timer"></div>
+            <div class="player-info p2">
+                <div class="health-bar-container">
+                    <div id="player2HealthBar"></div>
+                </div>
+                <div class="stamina-bar-container">
+                    <div id="player2StaminaBar"></div>
+                </div>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const homeScreenContent = document.getElementById('homeScreenContent');
+            const endGameContent = document.getElementById('endGameContent');
+            const mainButton = document.getElementById('mainButton');
+            const playAgainButton = document.getElementById('playAgainButton');
+            const backToHomeButton = document.getElementById('backToHomeButton');
+            const endGameTitle = document.getElementById('endGameTitle');
+            const messageBox = document.getElementById('messageBox');
+            const gameContainer = document.querySelector('.game-container');
+            const player1HealthBar = document.getElementById('player1HealthBar');
+            const player2HealthBar = document.getElementById('player2HealthBar');
+            const player1StaminaBar = document.getElementById('player1StaminaBar');
+            const player2StaminaBar = document.getElementById('player2StaminaBar');
+            const timerDisplay = document.getElementById('timer');
+            const finishHimDisplay = document.getElementById('finishHim');
+
+            // Game settings
+            const canvasWidth = 800;
+            const canvasHeight = 450;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            const groundY = canvasHeight - 30;
+            const gravity = 0.5;
+            const jumpPower = -12;
+            const moveSpeed = 4;
+            const fireballSpeed = 6;
+
+            let gameStarted = false;
+            let gameOver = false;
+            let fatalityMode = false;
+            let fatalityAnimationActive = false;
+            let keys = {};
+            let projectiles = [];
+            let timer = 99;
+            let timerId;
+            let animationFrameId;
+            let fatalityTimeoutId;
+            let detachedHead = null;
+
+            // Platforms
+            const platforms = [
+                { x: 100, y: 300, width: 150, height: 20 },
+                { x: 550, y: 300, width: 150, height: 20 },
+                { x: 325, y: 200, width: 150, height: 20 }
+            ];
+
+            // Sounds with Tone.js
+            const fatalitySynth = new Tone.Synth({
+                oscillator: { type: "sawtooth" },
+                envelope: {
+                    attack: 0.05,
+                    decay: 0.2,
+                    sustain: 0.1,
+                    release: 0.5,
+                }
+            }).toDestination();
+            
+            const fireballSynth = new Tone.NoiseSynth({
+                noise: { type: "pink" },
+                envelope: {
+                    attack: 0.005,
+                    decay: 0.1,
+                    sustain: 0,
+                    release: 0.1,
+                }
+            }).toDestination();
+            
+            const punchSynth = new Tone.MembraneSynth().toDestination();
+            const kickSynth = new Tone.MembraneSynth({
+                pitchDecay: 0.05,
+                octaves: 10,
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.4,
+                    sustain: 0.01,
+                    release: 1.4,
+                    attackCurve: "exponential"
+                }
+            }).toDestination();
+
+            // Player class
+            class Player {
+                constructor({ x, y, color, keysConfig, direction }) {
+                    this.x = x;
+                    this.y = y;
+                    this.width = 40;
+                    this.height = 80;
+                    this.color = color;
+                    this.health = 100;
+                    this.stamina = 100;
+                    this.maxStamina = 100;
+                    this.velocity = { x: 0, y: 0 };
+                    this.isJumping = false;
+                    this.isAttacking = false;
+                    this.isBlocking = false;
+                    this.isDead = false;
+                    this.lastAttackTime = 0;
+                    this.attackCooldown = 500;
+                    this.keysConfig = keysConfig;
+                    this.direction = direction;
+                    this.isPunching = false;
+                    this.isKicking = false;
+                }
+
+                draw() {
+                    // Only draw the player if they are not dead or in fatality animation
+                    if (this.isDead && fatalityAnimationActive) {
+                        return;
+                    }
+
+                    let bodyColor = this.color;
+                    ctx.fillStyle = bodyColor;
+                    
+                    // Main body
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                    // Head
+                    if (!this.isDead) { // Don't draw head if player is dead
+                        ctx.beginPath();
+                        ctx.arc(this.x + this.width / 2, this.y - 15, 15, 0, Math.PI * 2);
+                        ctx.fillStyle = this.isBlocking ? '#666' : bodyColor;
+                        ctx.fill();
+                    }
+
+                    // Arms and legs
+                    ctx.fillStyle = bodyColor;
+                    // Draw limbs, but not if they are part of an attack animation
+                    if (!this.isPunching) {
+                        ctx.fillRect(this.x, this.y + 20, 10, 30); // Left arm
+                        ctx.fillRect(this.x + this.width - 10, this.y + 20, 10, 30); // Right arm
+                    }
+                    if (!this.isKicking) {
+                        ctx.fillRect(this.x + 5, this.y + this.height - 20, 15, 20); // Left leg
+                        ctx.fillRect(this.x + this.width - 20, this.y + this.height - 20, 15, 20); // Right leg
+                    }
+
+                    // Punch animation
+                    if (this.isPunching) {
+                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--punch-color');
+                        const punchX = this.direction === 'right' ? this.x + this.width : this.x - 20;
+                        ctx.fillRect(punchX, this.y + 25, 20, 10);
+                    }
+                    // Kick animation
+                    if (this.isKicking) {
+                        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--kick-color');
+                        const kickX = this.direction === 'right' ? this.x + this.width : this.x - 30;
+                        const kickY = this.y + this.height - 15;
+                        ctx.fillRect(kickX, kickY, 30, 15);
+                    }
+                }
+
+                update() {
+                    if (this.isDead) {
+                        this.velocity.x = 0;
+                        this.velocity.y = 0;
+                        return;
+                    }
+                    this.draw();
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+
+                    let onPlatform = false;
+                    let newY = this.y + this.velocity.y;
+
+                    // Check for collisions with platforms
+                    platforms.forEach(platform => {
+                        if (
+                            this.y + this.height <= platform.y &&
+                            newY + this.height >= platform.y &&
+                            this.x + this.width >= platform.x &&
+                            this.x <= platform.x + platform.width
+                        ) {
+                            // Land on platform
+                            this.velocity.y = 0;
+                            this.y = platform.y - this.height;
+                            this.isJumping = false;
+                            onPlatform = true;
+                        }
+                    });
+
+                    // Check for collision with ground
+                    if (!onPlatform && this.y + this.height < groundY) {
+                        this.velocity.y += gravity;
+                    } else if (!onPlatform) {
+                        this.velocity.y = 0;
+                        this.y = groundY - this.height;
+                        this.isJumping = false;
+                    }
+                    
+                    if (this.y + this.height >= groundY) {
+                        this.isJumping = false;
+                    }
+
+                    if (this.x < 0) this.x = 0;
+                    if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
+                }
+                
+                jump() {
+                    let onGround = this.y + this.height >= groundY;
+                    let onPlatform = platforms.some(platform => 
+                        this.y + this.height === platform.y &&
+                        this.x + this.width > platform.x &&
+                        this.x < platform.x + platform.width
+                    );
+
+                    if (!this.isJumping && (onGround || onPlatform)) {
+                        this.velocity.y = jumpPower;
+                        this.isJumping = true;
+                    }
+                }
+
+                takeHit(damage) {
+                    if (this.isBlocking) {
+                        this.stamina -= damage;
+                        if (this.stamina < 0) {
+                            this.stamina = 0;
+                            this.isBlocking = false;
+                        }
+                    } else {
+                        this.health -= damage;
+                    }
+                    if (this.health < 0) this.health = 0;
+                }
+
+                punch() {
+                    if (Date.now() - this.lastAttackTime > this.attackCooldown) {
+                        punchSynth.triggerAttackRelease("C4", "8n");
+                        this.isAttacking = true;
+                        this.isPunching = true;
+                        this.lastAttackTime = Date.now();
+                        setTimeout(() => {
+                            this.isAttacking = false;
+                            this.isPunching = false;
+                        }, 200);
+                        return { damage: 10, range: 40, yOffset: 25, height: 10, width: 20 };
+                    }
+                    return null;
+                }
+
+                kick() {
+                    if (Date.now() - this.lastAttackTime > this.attackCooldown) {
+                        kickSynth.triggerAttackRelease("G3", "8n");
+                        this.isAttacking = true;
+                        this.isKicking = true;
+                        this.lastAttackTime = Date.now();
+                        setTimeout(() => {
+                            this.isAttacking = false;
+                            this.isKicking = false;
+                        }, 200);
+                        return { damage: 15, range: 60, yOffset: this.height - 15, height: 15, width: 30 };
+                    }
+                    return null;
+                }
+
+                fireball() {
+                    const fireballCost = 30;
+                    if (this.stamina >= fireballCost && Date.now() - this.lastAttackTime > 1500) {
+                        fireballSynth.triggerAttackRelease("8n");
+                        this.stamina -= fireballCost;
+                        this.lastAttackTime = Date.now();
+                        const projectileSpeed = this.direction === 'left' ? -fireballSpeed : fireballSpeed;
+                        const projectileX = this.x + (this.direction === 'left' ? -20 : this.width);
+                        projectiles.push(new Projectile({
+                            x: projectileX,
+                            y: this.y + this.height / 2 - 5,
+                            width: 20,
+                            height: 10,
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--fireball-color'),
+                            velocity: projectileSpeed,
+                            owner: this
+                        }));
+                    }
+                }
+            }
+
+            // Projectile class (Fireball)
+            class Projectile {
+                constructor({ x, y, width, height, color, velocity, owner }) {
+                    this.x = x;
+                    this.y = y;
+                    this.width = width;
+                    this.height = height;
+                    this.color = color;
+                    this.velocity = velocity;
+                    this.owner = owner;
+                    this.isHit = false;
+                }
+
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+
+                update() {
+                    this.x += this.velocity;
+                    this.draw();
+                }
+            }
+
+            // Head class for fatality animation
+            class Head {
+                constructor({ x, y, color, velocityX, velocityY }) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = 15;
+                    this.color = color;
+                    this.velocity = { x: velocityX, y: velocityY };
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    if (this.y + this.size < groundY) {
+                        this.velocity.y += gravity;
+                    } else {
+                        this.velocity.y = 0;
+                        this.y = groundY - this.size;
+                    }
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                }
+            }
+
+
+            let player1, player2;
+
+            function initGame() {
+                if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
+                if (timerId) { clearInterval(timerId); }
+
+                messageBox.style.display = 'none'; // This line was added
+                homeScreenContent.style.display = 'none';
+                endGameContent.style.display = 'none';
+                gameContainer.style.display = 'flex';
+                finishHimDisplay.style.display = 'none';
+                
+                player1 = new Player({
+                    x: 100, y: groundY - 80, 
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--player1-color'),
+                    keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'z' },
+                    direction: 'right'
+                });
+                player2 = new Player({
+                    x: canvasWidth - 140, y: groundY - 80, 
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--player2-color'),
+                    keysConfig: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', block: 'ArrowDown', punch: 'k', kick: 'l', fireball: 'j' },
+                    direction: 'left'
+                });
+
+                gameStarted = true;
+                gameOver = false;
+                fatalityMode = false;
+                fatalityAnimationActive = false;
+                keys = {};
+                projectiles = [];
+                timer = 99;
+                detachedHead = null;
+                
+                timerId = setInterval(() => {
+                    timer--;
+                    if (timer <= 0) { endGame(); }
+                }, 1000);
+
+                animate();
+            }
+
+            function endGame(winner = null) {
+                gameOver = true;
+                clearInterval(timerId);
+                cancelAnimationFrame(animationFrameId);
+                messageBox.style.display = 'block';
+                gameContainer.style.display = 'none';
+                finishHimDisplay.style.display = 'none';
+                
+                homeScreenContent.style.display = 'none';
+                endGameContent.style.display = 'block';
+
+                endGameTitle.innerText = winner ? `${winner} Venceu!` : 'Empate!';
+            }
+
+            function showHomeScreen() {
+                if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
+                if (timerId) { clearInterval(timerId); }
+                if (fatalityTimeoutId) { clearTimeout(fatalityTimeoutId); }
+
+                gameStarted = false;
+                gameOver = false;
+                fatalityMode = false;
+                fatalityAnimationActive = false;
+                keys = {};
+                projectiles = [];
+                timer = 99;
+
+                messageBox.style.display = 'block';
+                gameContainer.style.display = 'none';
+                finishHimDisplay.style.display = 'none';
+                
+                endGameContent.style.display = 'none';
+                homeScreenContent.style.display = 'block';
+            }
+
+            function updateHealthBars() {
+                player1HealthBar.style.width = `${player1.health}%`;
+                player2HealthBar.style.width = `${player2.health}%`;
+                player1StaminaBar.style.width = `${player1.stamina}%`;
+                player2StaminaBar.style.width = `${player2.stamina}%`;
+                
+                if (player1.health <= 30) player1HealthBar.style.backgroundColor = 'red';
+                else if (player1.health <= 60) player1HealthBar.style.backgroundColor = 'orange';
+                else player1HealthBar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--player1-color');
+
+                if (player2.health <= 30) player2HealthBar.style.backgroundColor = 'red';
+                else if (player2.health <= 60) player2HealthBar.style.backgroundColor = 'orange';
+                else player2HealthBar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--player2-color');
+            }
+            
+            // Fatality animation state
+            let animationStep = 0;
+            const animationSteps = 10;
+            let winner, loser;
+            const headDetachStep = 7;
+
+            function playFatalityAnimation() {
+                if (animationStep < animationSteps) {
+                    // Move winner towards loser
+                    const targetX = loser.x - (winner.width / 2);
+                    const diffX = targetX - winner.x;
+                    winner.x += diffX * 0.1;
+                    winner.isAttacking = true;
+                    animationStep++;
+                    
+                    // Reduce loser's health for visual effect
+                    loser.health -= 100 / animationSteps;
+                    if(loser.health < 0) loser.health = 0;
+
+                    // Detach head at a specific step
+                    if (animationStep === headDetachStep && detachedHead === null) {
+                        detachedHead = new Head({
+                            x: loser.x + loser.width / 2,
+                            y: loser.y - 15,
+                            color: loser.color,
+                            velocityX: loser.direction === 'right' ? 3 : -3,
+                            velocityY: -5
+                        });
+                        loser.isDead = true; // Mark loser as dead so no body is drawn
+                    }
+
+                    // Play a punch sound for each step
+                    punchSynth.triggerAttackRelease("C4", "32n");
+                } else {
+                    winner.isAttacking = false;
+                    loser.health = 0;
+                    // End the game after a small delay to let the animation finish
+                    fatalityTimeoutId = setTimeout(() => {
+                        if (winner === player1) {
+                            endGame('Jogador 1');
+                        } else {
+                            endGame('Jogador 2');
+                        }
+                    }, 2500); // 2.5 seconds delay
+                }
+            }
+
+            function animate() {
+                if (gameOver) return;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw ground
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, groundY, canvasWidth, canvasHeight - groundY);
+                
+                // Draw platforms
+                ctx.fillStyle = '#6b7280';
+                platforms.forEach(platform => {
+                    ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                });
+                
+                if (fatalityAnimationActive) {
+                    playFatalityAnimation();
+                    player1.update();
+                    player2.update();
+                    if (detachedHead) {
+                        detachedHead.update();
+                        detachedHead.draw();
+                    }
+                } else if (fatalityMode) {
+                    // Stop movement in fatality mode
+                    player1.velocity.x = 0;
+                    player2.velocity.x = 0;
+                    player1.update();
+                    player2.update();
+                } else {
+                    player1.velocity.x = 0;
+                    player2.velocity.x = 0;
+                    player1.isBlocking = keys[player1.keysConfig.block];
+                    player2.isBlocking = keys[player2.keysConfig.block];
+
+                    if (keys[player1.keysConfig.left]) { player1.velocity.x = -moveSpeed; player1.direction = 'left'; }
+                    if (keys[player1.keysConfig.right]) { player1.velocity.x = moveSpeed; player1.direction = 'right'; }
+                    if (keys[player1.keysConfig.jump]) { player1.jump(); }
+
+                    if (keys[player2.keysConfig.left]) { player2.velocity.x = -moveSpeed; player2.direction = 'left'; }
+                    if (keys[player2.keysConfig.right]) { player2.velocity.x = moveSpeed; player2.direction = 'right'; }
+                    if (keys[player2.keysConfig.jump]) { player2.jump(); }
+                    
+                    player1.update();
+                    player2.update();
+                    
+                    // Check attack collision
+                    const checkCollision = (attacker, defender, attack) => {
+                        const attackX = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x - attack.width;
+                        const attackY = attacker.y + attack.yOffset;
+                        if (
+                            attackX + attack.width >= defender.x &&
+                            attackX <= defender.x + defender.width &&
+                            attackY + attack.height >= defender.y &&
+                            attackY <= defender.y + defender.height
+                        ) {
+                            defender.takeHit(attack.damage);
+                        }
+                    };
+
+                    if (keys[player1.keysConfig.punch]) { 
+                        const attack = player1.punch(); 
+                        if (attack) checkCollision(player1, player2, attack);
+                    }
+                    if (keys[player1.keysConfig.kick]) { 
+                        const attack = player1.kick();
+                        if (attack) checkCollision(player1, player2, attack);
+                    }
+                    if (keys[player1.keysConfig.fireball]) { player1.fireball(); }
+
+                    if (keys[player2.keysConfig.punch]) {
+                        const attack = player2.punch();
+                        if (attack) checkCollision(player2, player1, attack);
+                    }
+                    if (keys[player2.keysConfig.kick]) {
+                        const attack = player2.kick();
+                        if (attack) checkCollision(player2, player1, attack);
+                    }
+                    if (keys[player2.keysConfig.fireball]) { player2.fireball(); }
+
+                    // Check projectile collision
+                    projectiles.forEach((p, index) => {
+                        p.update();
+                        const opponent = p.owner === player1 ? player2 : player1;
+                        if (
+                            p.x + p.width >= opponent.x &&
+                            p.x <= opponent.x + opponent.width &&
+                            p.y + p.height >= opponent.y &&
+                            p.y <= opponent.y + opponent.height
+                        ) {
+                            if (!p.isHit) {
+                                opponent.takeHit(25);
+                                p.isHit = true;
+                                projectiles.splice(index, 1);
+                            }
+                        }
+                        if (p.x < -p.width || p.x > canvas.width) {
+                            projectiles.splice(index, 1);
+                        }
+                    });
+                }
+                
+                updateHealthBars();
+                timerDisplay.innerText = timer;
+                
+                // Check fatality condition
+                if (player1.health <= 10 && !fatalityMode && !fatalityAnimationActive) {
+                    fatalityMode = true;
+                    finishHimDisplay.style.display = 'block';
+                    fatalitySynth.triggerAttackRelease("C4", "1s");
+                }
+                if (player2.health <= 10 && !fatalityMode && !fatalityAnimationActive) {
+                    fatalityMode = true;
+                    finishHimDisplay.style.display = 'block';
+                    fatalitySynth.triggerAttackRelease("C4", "1s");
+                }
+
+                if (player1.health <= 0 && !fatalityAnimationActive) { endGame('Jogador 2'); }
+                if (player2.health <= 0 && !fatalityAnimationActive) { endGame('Jogador 1'); }
+                
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            
+            document.addEventListener('keydown', (e) => {
+                if (!gameStarted) return;
+                keys[e.key] = true;
+                keys[e.key.toLowerCase()] = true;
+                
+                if (fatalityMode && !fatalityAnimationActive) {
+                    if (e.key.toLowerCase() === 'x') {
+                        if (player2.health > 0) {
+                            fatalityAnimationActive = true;
+                            animationStep = 0;
+                            winner = player1;
+                            loser = player2;
+                        }
+                    }
+                    if (e.key.toLowerCase() === 'i') {
+                         if (player1.health > 0) {
+                            fatalityAnimationActive = true;
+                            animationStep = 0;
+                            winner = player2;
+                            loser = player1;
+                         }
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                if (!gameStarted) return;
+                keys[e.key] = false;
+                keys[e.key.toLowerCase()] = false;
+            });
+
+            // Set up initial and end game button handlers
+            mainButton.addEventListener('click', initGame);
+            playAgainButton.addEventListener('click', initGame);
+            backToHomeButton.addEventListener('click', showHomeScreen);
+            
+            // Show the home screen initially
+            showHomeScreen();
+        }
+    </script>
+</body>
+</html>
