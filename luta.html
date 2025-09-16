@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +13,10 @@
             --player1-color: #ff3300;
             --player2-color: #00aaff;
             --body-color: #f1c27d;
+            --p1-trunk-color: #2980b9;
+            --p2-trunk-color: #9b59b6;
+            --p1-pants-color: #2ecc71;
+            --p2-pants-color: #f39c12;
             --punch-color: #ffff00;
             --kick-color: #ff9900;
             --fireball-color: #ff0000;
@@ -53,7 +56,6 @@
             width: 800px;
             box-sizing: content-box;
         }
-
         @media (max-width: 850px) {
             .game-container {
                 width: 95%;
@@ -69,8 +71,7 @@
             margin-bottom: 5px;
         }
 
-        .health-bar-container,
-        .stamina-bar-container {
+        .health-bar-container, .stamina-bar-container {
             width: 45%;
             height: 25px;
             background-color: #4b5563;
@@ -79,17 +80,14 @@
             overflow: hidden;
             position: relative;
         }
-
+        
         .stamina-bar-container {
             height: 12px;
             border-color: var(--stamina-color);
             margin-top: 5px;
         }
 
-        #player1HealthBar,
-        #player2HealthBar,
-        #player1StaminaBar,
-        #player2StaminaBar {
+        #player1HealthBar, #player2HealthBar, #player1StaminaBar, #player2StaminaBar {
             height: 100%;
             width: 100%;
             transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
@@ -98,35 +96,13 @@
             left: 0;
         }
 
-        #player1HealthBar {
-            background-color: var(--player1-color);
-        }
+        #player1HealthBar { background-color: var(--player1-color); }
+        #player2HealthBar { background-color: var(--player2-color); left: auto; right: 0; }
+        #player1StaminaBar { background-color: var(--stamina-color); }
+        #player2StaminaBar { background-color: var(--stamina-color); left: auto; right: 0; }
 
-        #player2HealthBar {
-            background-color: var(--player2-color);
-            left: auto;
-            right: 0;
-        }
-
-        #player1StaminaBar {
-            background-color: var(--stamina-color);
-        }
-
-        #player2StaminaBar {
-            background-color: var(--stamina-color);
-            left: auto;
-            right: 0;
-        }
-
-        .health-bar-container.p1,
-        .stamina-bar-container.p1 {
-            transform: scaleX(-1);
-        }
-
-        .health-bar-container.p1 #player1HealthBar,
-        .stamina-bar-container.p1 #player1StaminaBar {
-            transform: scaleX(-1);
-        }
+        .health-bar-container.p1, .stamina-bar-container.p1 { transform: scaleX(-1); }
+        .health-bar-container.p1 #player1HealthBar, .stamina-bar-container.p1 #player1StaminaBar { transform: scaleX(-1); }
 
         .player-info {
             display: flex;
@@ -134,20 +110,14 @@
             width: 45%;
             align-items: flex-start;
         }
-
-        .player-info.p2 {
-            align-items: flex-end;
-        }
-
+        .player-info.p2 { align-items: flex-end; }
+        
         .player-name {
             font-size: clamp(0.7rem, 1.5vw, 1.1rem);
             margin-bottom: 5px;
             text-shadow: 1px 1px #000;
         }
-
-        .player-name.p2 {
-            text-align: right;
-        }
+        .player-name.p2 { text-align: right; }
 
         #timer {
             font-size: clamp(1rem, 2vw, 1.2rem);
@@ -167,14 +137,14 @@
             max-width: 800px;
             aspect-ratio: 16 / 9;
         }
-
+        
         .message-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: #2d3748;
-            padding: 30px;
+            padding: 30px; 
             border-radius: 12px;
             border: 5px solid black;
             z-index: 10;
@@ -183,48 +153,47 @@
             max-width: 600px;
             width: 90%;
             max-height: 95vh;
-            overflow-y: auto;
+            overflow-y: auto; 
             animation: fadeIn 0.5s ease-in-out;
             color: var(--ui-color);
             font-size: 14px;
         }
-
+        
         @media (min-width: 768px) {
             .message-container {
                 max-width: 800px;
             }
-
             .message-container .controls {
                 flex-direction: row;
                 justify-content: space-around;
             }
         }
-
+        
         .home-title {
             font-size: clamp(2rem, 5vw, 4rem);
             margin-bottom: 20px;
             color: #fff;
-            text-shadow: 3px 3px 0 #8b0000,
-                6px 6px 0 #ffa500;
+            text-shadow: 3px 3px 0 #8b0000, 
+                         6px 6px 0 #ffa500;
         }
 
         .message-container .subtitle {
             font-size: clamp(0.9rem, 2vw, 1.5rem);
             color: #cbd5e1;
-            margin-bottom: 20px;
+            margin-bottom: 20px; 
             text-shadow: 1px 1px #000;
         }
-
+        
         .message-container p {
             font-size: clamp(0.7rem, 1.5vw, 1.1rem);
-            margin-bottom: 10px;
+            margin-bottom: 10px; 
             color: #e5e7eb;
             line-height: 1.5;
             text-shadow: 1px 1px #000;
         }
 
         .message-container .controls {
-            margin-top: 20px;
+            margin-top: 20px; 
             text-align: left;
             padding: 0 10px;
             word-wrap: break-word;
@@ -232,7 +201,7 @@
             flex-direction: column;
             gap: 15px;
         }
-
+        
         .message-container .controls .player-controls {
             background-color: #4b5563;
             padding: 15px;
@@ -240,15 +209,15 @@
             border: 2px solid #6b7280;
             flex: 1;
         }
-
+        
         .message-container .key {
             color: #fca5a5;
             text-shadow: 1px 1px #000;
         }
-
+        
         .message-container .fatality-key {
-            color: #ff0000;
-            font-weight: bold;
+             color: #ff0000;
+             font-weight: bold;
         }
 
         .button-group {
@@ -288,21 +257,19 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: clamp(0.9rem, 2vw, 1.2rem);
-            box-shadow: 0 6px 0 #8b0000, 0 8px 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 6px 0 #8b0000, 0 8px 10px rgba(0,0,0,0.5);
             transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
             flex: 1;
         }
-
-        #controlsButton,
-        #backToHomeFromControls {
-            background: #4b5563;
-            box-shadow: 0 6px 0 #2d3748, 0 8px 10px rgba(0, 0, 0, 0.5);
-            color: var(--ui-color);
-            border-color: #000;
+        
+        #controlsButton, #backToHomeFromControls {
+             background: #4b5563;
+             box-shadow: 0 6px 0 #2d3748, 0 8px 10px rgba(0,0,0,0.5);
+             color: var(--ui-color);
+             border-color: #000;
         }
-
-        #controlsButton:active,
-        #backToHomeFromControls:active {
+        
+        #controlsButton:active, #backToHomeFromControls:active {
             box-shadow: 0 2px 0 #2d3748;
         }
 
@@ -311,11 +278,11 @@
                 flex-direction: row;
             }
         }
-
+        
         .message-container button:hover {
-            box-shadow: 0 4px 0 #8b0000, 0 6px 8px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 0 #8b0000, 0 6px 8px rgba(0,0,0,0.5);
         }
-
+        
         .message-container button:active {
             transform: translateY(2px);
             box-shadow: 0 2px 0 #8b0000;
@@ -333,86 +300,18 @@
             display: none;
             z-index: 10;
         }
-
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        /* Character Selection Styles */
-        .character-selection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-
-        .character-option {
-            background-color: #374151;
-            border: 3px solid #6b7280;
-            border-radius: 8px;
-            cursor: pointer;
-            padding: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            text-align: center;
-        }
-
-        .character-option:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .character-option.selected-p1 {
-            border-color: var(--player1-color);
-            box-shadow: 0 0 15px var(--player1-color);
-        }
-
-        .character-option.selected-p2 {
-            border-color: var(--player2-color);
-            box-shadow: 0 0 15px var(--player2-color);
-        }
-
-        .character-option img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: auto;
-            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-            image-rendering: pixelated;
-        }
-
-        .character-option .character-name {
-            margin-top: 5px;
-            font-size: clamp(0.6rem, 1.2vw, 0.9rem);
-            color: var(--ui-color);
-            text-shadow: 1px 1px #000;
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
     </style>
 </head>
-
 <body>
     <div id="finishHim">FATALITY!</div>
     <div id="messageBox" class="message-container">
@@ -426,21 +325,6 @@
             <div class="button-group">
                 <button id="mainButton">Começar</button>
                 <button id="controlsButton">Controles</button>
-            </div>
-        </div>
-        <div id="characterSelectionContent" style="display: none;">
-            <h2 class="home-title" style="text-shadow: 2px 2px #4b5563;">Escolha seu Lutador</h2>
-            <div id="player1Selection">
-                <p class="subtitle">Jogador 1</p>
-                <div id="player1CharGrid" class="character-selection-grid"></div>
-            </div>
-            <div id="player2Selection" style="margin-top: 20px;">
-                <p class="subtitle">Jogador 2</p>
-                <div id="player2CharGrid" class="character-selection-grid"></div>
-            </div>
-            <div class="button-group">
-                <button id="confirmSelectionButton">Confirmar e Lutar</button>
-                <button id="backFromSelectionButton">Voltar</button>
             </div>
         </div>
         <div id="controlsScreenContent" style="display: none;">
@@ -497,16 +381,15 @@
                     <div id="player2StaminaBar"></div>
                 </div>
             </div>
-        </div>
+            </div>
         <canvas id="gameCanvas"></canvas>
     </div>
 
     <script>
-        window.onload = function () {
+        window.onload = function() {
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
             const homeScreenContent = document.getElementById('homeScreenContent');
-            const characterSelectionContent = document.getElementById('characterSelectionContent');
             const controlsScreenContent = document.getElementById('controlsScreenContent');
             const endGameContent = document.getElementById('endGameContent');
             const mainButton = document.getElementById('mainButton');
@@ -514,8 +397,6 @@
             const playAgainButton = document.getElementById('playAgainButton');
             const backToHomeButton = document.getElementById('backToHomeButton');
             const backToHomeFromControls = document.getElementById('backToHomeFromControls');
-            const confirmSelectionButton = document.getElementById('confirmSelectionButton');
-            const backFromSelectionButton = document.getElementById('backFromSelectionButton');
             const endGameTitle = document.getElementById('endGameTitle');
             const messageBox = document.getElementById('messageBox');
             const gameContainer = document.querySelector('.game-container');
@@ -529,8 +410,6 @@
             const player2NameDisplay = document.getElementById('player2Name');
             const timerDisplay = document.getElementById('timer');
             const finishHimDisplay = document.getElementById('finishHim');
-            const player1CharGrid = document.getElementById('player1CharGrid');
-            const player2CharGrid = document.getElementById('player2CharGrid');
 
             // Game settings
             const canvasWidth = 800;
@@ -543,7 +422,6 @@
             const jumpPower = -12;
             const moveSpeed = 4;
             const fireballSpeed = 6;
-            const playerSize = { width: 80, height: 130 }; // Tamanho das imagens
 
             let gameStarted = false;
             let gameOver = false;
@@ -555,18 +433,7 @@
             let timerId;
             let animationFrameId;
             let fatalityTimeoutId;
-
-            let player1SelectedChar = null;
-            let player2SelectedChar = null;
-            let player1CharacterName = 'JOGADOR 1';
-            let player2CharacterName = 'JOGADOR 2';
-
-            const characters = [
-                { name: 'Eduardo', image: 'public/eduardo.png' },
-                { name: 'Felipe', image: 'public/felipe.png' },
-                { name: 'Marcelo', image: 'public/marcelo.png' },
-                { name: 'Thiago', image: 'public/thiago.png' }
-            ];
+            let detachedHead = null;
 
             // Platforms
             const platforms = [
@@ -585,7 +452,7 @@
                     release: 0.5,
                 }
             }).toDestination();
-
+            
             const fireballSynth = new Tone.NoiseSynth({
                 noise: { type: "pink" },
                 envelope: {
@@ -595,7 +462,7 @@
                     release: 0.1,
                 }
             }).toDestination();
-
+            
             const punchSynth = new Tone.MembraneSynth().toDestination();
             const kickSynth = new Tone.MembraneSynth({
                 pitchDecay: 0.05,
@@ -611,14 +478,15 @@
 
             // Player class
             class Player {
-                constructor({ x, y, character, keysConfig, direction, name }) {
+                constructor({ x, y, playerColor, keysConfig, direction, trunkColor, pantsColor, name }) {
                     this.x = x;
                     this.y = y;
-                    this.width = playerSize.width;
-                    this.height = playerSize.height;
-                    this.character = character;
-                    this.image = new Image();
-                    this.image.src = this.character.image;
+                    this.width = 60; // Tamanho ajustado para proporções melhores
+                    this.height = 120;
+                    this.playerColor = playerColor;
+                    this.trunkColor = trunkColor;
+                    this.pantsColor = pantsColor;
+                    this.bodyColor = getComputedStyle(document.documentElement).getPropertyValue('--body-color');
                     this.name = name;
                     this.health = 100;
                     this.stamina = 100;
@@ -632,30 +500,73 @@
                     this.attackCooldown = 500;
                     this.keysConfig = keysConfig;
                     this.direction = direction;
+                    this.isPunching = false;
+                    this.isKicking = false;
                 }
 
                 draw() {
-                    if (this.isDead) return;
+                    if (this.isDead && fatalityAnimationActive) {
+                        return;
+                    }
+                    
+                    // Draw player name above the head
+                    ctx.fillStyle = this.playerColor;
+                    ctx.font = "12px 'Press Start 2P', cursive";
+                    ctx.textAlign = 'center';
+                    ctx.fillText(this.name, this.x + this.width / 2, this.y - 10);
+                    
+                    // Base x position for drawing, adjusted for direction
+                    const baseX = this.direction === 'right' ? this.x : this.x + this.width;
+                    const xScale = this.direction === 'right' ? 1 : -1;
 
                     ctx.save();
-                    ctx.textAlign = 'center';
-                    ctx.font = "12px 'Press Start 2P', cursive";
-                    ctx.fillStyle = this.playerColor; // Cor do nome
-                    ctx.fillText(this.name, this.x + this.width / 2, this.y - 10);
+                    ctx.translate(baseX, this.y);
+                    ctx.scale(xScale, 1);
 
-                    if (this.direction === 'left') {
-                        ctx.translate(this.x + this.width, this.y);
-                        ctx.scale(-1, 1);
-                        ctx.drawImage(this.image, 0, 0, this.width, this.height);
+                    // Head
+                    if (!this.isDead) {
+                        ctx.beginPath();
+                        ctx.arc(this.width / 2, 20, 15, 0, Math.PI * 2);
+                        ctx.fillStyle = this.bodyColor;
+                        ctx.fill();
+                    }
+
+                    // Trunk
+                    ctx.fillStyle = this.trunkColor;
+                    ctx.fillRect(this.width / 4, 30, this.width / 2, this.height * 0.4);
+
+                    // Arms
+                    ctx.fillStyle = this.bodyColor;
+                    
+                    if (this.isPunching) {
+                        // Braço de soco
+                        ctx.fillRect(this.width / 4 + 10, this.height * 0.3, this.width * 0.8, 10);
+                        // Braço de trás
+                        ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
                     } else {
-                        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+                        // Braços normais
+                        ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
+                        ctx.fillRect(this.width * 0.75 - 10, this.height * 0.3, 10, this.height * 0.3);
                     }
 
-                    if (this.isAttacking) {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                        ctx.fillRect(0, 0, this.width, this.height);
+                    // Legs
+                    ctx.fillStyle = this.pantsColor;
+                    
+                    if (this.isKicking) {
+                        // Perna de chute
+                        ctx.save();
+                        ctx.translate(this.width * 0.5, this.height * 0.7 + 10);
+                        ctx.rotate(Math.PI / 4 * 1.5);
+                        ctx.fillRect(-5, -5, 10, this.height * 0.6);
+                        ctx.restore();
+                        // Perna de apoio
+                        ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
+                    } else {
+                         // Pernas normais
+                        ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
+                        ctx.fillRect(this.width * 0.75 - 10, this.height * 0.7, 10, this.height * 0.3);
                     }
-
+                    
                     ctx.restore();
                 }
 
@@ -696,7 +607,7 @@
                         this.y = groundY - this.height;
                         this.isJumping = false;
                     }
-
+                    
                     if (this.y + this.height >= groundY) {
                         this.isJumping = false;
                     }
@@ -704,10 +615,10 @@
                     if (this.x < 0) this.x = 0;
                     if (this.x + this.width > canvas.width) this.x = canvas.width - this.width;
                 }
-
+                
                 jump() {
                     let onGround = this.y + this.height >= groundY;
-                    let onPlatform = platforms.some(platform =>
+                    let onPlatform = platforms.some(platform => 
                         this.y + this.height === platform.y &&
                         this.x + this.width > platform.x &&
                         this.x < platform.x + platform.width
@@ -736,11 +647,13 @@
                     if (Date.now() - this.lastAttackTime > this.attackCooldown) {
                         punchSynth.triggerAttackRelease("C4", "8n");
                         this.isAttacking = true;
+                        this.isPunching = true;
                         this.lastAttackTime = Date.now();
                         setTimeout(() => {
                             this.isAttacking = false;
+                            this.isPunching = false;
                         }, 200);
-                        return { damage: 10, range: 40, yOffset: this.height / 2, height: 20, width: 40 };
+                        return { damage: 10, range: 40, yOffset: 60, height: 10, width: 40 };
                     }
                     return null;
                 }
@@ -749,11 +662,13 @@
                     if (Date.now() - this.lastAttackTime > this.attackCooldown) {
                         kickSynth.triggerAttackRelease("G3", "8n");
                         this.isAttacking = true;
+                        this.isKicking = true;
                         this.lastAttackTime = Date.now();
                         setTimeout(() => {
                             this.isAttacking = false;
+                            this.isKicking = false;
                         }, 200);
-                        return { damage: 15, range: 60, yOffset: this.height - 30, height: 20, width: 60 };
+                        return { damage: 15, range: 60, yOffset: 120, height: 15, width: 80 };
                     }
                     return null;
                 }
@@ -803,48 +718,77 @@
                 }
             }
 
+            // Head class for fatality animation
+            class Head {
+                constructor({ x, y, color, velocityX, velocityY }) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = 20;
+                    this.color = color;
+                    this.velocity = { x: velocityX, y: velocityY };
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    if (this.y + this.size < groundY) {
+                        this.velocity.y += gravity;
+                    } else {
+                        this.velocity.y = 0;
+                        this.y = groundY - this.size;
+                    }
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                }
+            }
+
             let player1, player2;
 
             function initGame() {
-                if (!player1SelectedChar || !player2SelectedChar) {
-                    // Use a custom message box instead of alert()
-                    const messageBox = document.createElement('div');
-                    messageBox.className = 'message-container';
-                    messageBox.innerHTML = `
-                        <h2 class="home-title">Erro!</h2>
-                        <p class="subtitle">Por favor, selecione um personagem para cada jogador.</p>
-                        <button id="closeError">OK</button>
-                    `;
-                    document.body.appendChild(messageBox);
-                    document.getElementById('closeError').addEventListener('click', () => {
-                        document.body.removeChild(messageBox);
-                    });
+                // Checa se os nomes dos jogadores foram inseridos
+                const p1Name = player1NameInput.value.trim() || 'JOGADOR 1';
+                const p2Name = player2NameInput.value.trim() || 'JOGADOR 2';
+
+                if (!p1Name || !p2Name) {
+                    // Se algum nome estiver faltando, não inicia o jogo e retorna
                     return;
                 }
 
                 if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
                 if (timerId) { clearInterval(timerId); }
 
-                player1NameDisplay.innerText = player1NameInput.value.trim() || player1CharacterName;
-                player2NameDisplay.innerText = player2NameInput.value.trim() || player2CharacterName;
+                player1NameDisplay.innerText = p1Name;
+                player2NameDisplay.innerText = p2Name;
 
                 messageBox.style.display = 'none';
+                homeScreenContent.style.display = 'none';
+                controlsScreenContent.style.display = 'none';
+                endGameContent.style.display = 'none';
                 gameContainer.style.display = 'flex';
                 finishHimDisplay.style.display = 'none';
-
+                
                 player1 = new Player({
-                    x: 100, y: groundY - playerSize.height,
-                    character: player1SelectedChar,
-                    keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'x' },
+                    x: 100, y: groundY - 120,
+                    playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player1-color'),
+                    trunkColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-trunk-color'),
+                    pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-pants-color'),
+                    keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'z' },
                     direction: 'right',
-                    name: player1NameDisplay.innerText
+                    name: p1Name
                 });
                 player2 = new Player({
-                    x: canvasWidth - 100 - playerSize.width, y: groundY - playerSize.height,
-                    character: player2SelectedChar,
-                    keysConfig: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', block: 'ArrowDown', punch: 'k', kick: 'l', fireball: 'i' },
+                    x: canvasWidth - 140, y: groundY - 120,
+                    playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player2-color'),
+                    trunkColor: getComputedStyle(document.documentElement).getPropertyValue('--p2-trunk-color'),
+                    pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p2-pants-color'),
+                    keysConfig: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', block: 'ArrowDown', punch: 'k', kick: 'l', fireball: 'j' },
                     direction: 'left',
-                    name: player2NameDisplay.innerText
+                    name: p2Name
                 });
 
                 gameStarted = true;
@@ -854,7 +798,8 @@
                 keys = {};
                 projectiles = [];
                 timer = 99;
-
+                detachedHead = null;
+                
                 timerId = setInterval(() => {
                     timer--;
                     if (timer <= 0) { endGame(); }
@@ -870,10 +815,9 @@
                 messageBox.style.display = 'block';
                 gameContainer.style.display = 'none';
                 finishHimDisplay.style.display = 'none';
-
+                
                 homeScreenContent.style.display = 'none';
                 controlsScreenContent.style.display = 'none';
-                characterSelectionContent.style.display = 'none';
                 endGameContent.style.display = 'block';
 
                 endGameTitle.innerText = winner ? `${winner} Venceu!` : 'Empate!';
@@ -892,31 +836,18 @@
                 projectiles = [];
                 timer = 99;
 
-                // Clear selection states
-                player1SelectedChar = null;
-                player2SelectedChar = null;
-                document.querySelectorAll('.character-option').forEach(el => {
-                    el.classList.remove('selected-p1', 'selected-p2');
-                });
-
                 messageBox.style.display = 'block';
                 gameContainer.style.display = 'none';
                 finishHimDisplay.style.display = 'none';
-
+                
                 controlsScreenContent.style.display = 'none';
                 endGameContent.style.display = 'none';
-                characterSelectionContent.style.display = 'none';
                 homeScreenContent.style.display = 'block';
             }
-
+            
             function showControlsScreen() {
                 homeScreenContent.style.display = 'none';
                 controlsScreenContent.style.display = 'block';
-            }
-
-            function showCharacterSelectionScreen() {
-                homeScreenContent.style.display = 'none';
-                characterSelectionContent.style.display = 'block';
             }
 
             function updateHealthBars() {
@@ -924,7 +855,7 @@
                 player2HealthBar.style.width = `${player2.health}%`;
                 player1StaminaBar.style.width = `${player1.stamina}%`;
                 player2StaminaBar.style.width = `${player2.stamina}%`;
-
+                
                 if (player1.health <= 30) player1HealthBar.style.backgroundColor = 'red';
                 else if (player1.health <= 60) player1HealthBar.style.backgroundColor = 'orange';
                 else player1HealthBar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--player1-color');
@@ -932,6 +863,50 @@
                 if (player2.health <= 30) player2HealthBar.style.backgroundColor = 'red';
                 else if (player2.health <= 60) player2HealthBar.style.backgroundColor = 'orange';
                 else player2HealthBar.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--player2-color');
+            }
+            
+            // Fatality animation state
+            let animationStep = 0;
+            const animationSteps = 10;
+            let winner, loser;
+            const headDetachStep = 7;
+
+            function playFatalityAnimation() {
+                if (animationStep < animationSteps) {
+                    // Move winner towards loser
+                    const targetX = loser.x - (winner.width / 2);
+                    const diffX = targetX - winner.x;
+                    winner.x += diffX * 0.1;
+                    winner.isAttacking = true;
+                    animationStep++;
+                    
+                    // Reduce loser's health for visual effect
+                    loser.health -= 100 / animationSteps;
+                    if(loser.health < 0) loser.health = 0;
+
+                    // Detach head at a specific step
+                    if (animationStep === headDetachStep && detachedHead === null) {
+                        detachedHead = new Head({
+                            x: loser.x + loser.width / 2,
+                            y: loser.y + 20,
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--body-color'),
+                            velocityX: loser.direction === 'right' ? 3 : -3,
+                            velocityY: -5
+                        });
+                        loser.isDead = true; // Mark loser as dead so no body is drawn
+                    }
+
+                    // Play a punch sound for each step
+                    punchSynth.triggerAttackRelease("C4", "32n");
+                } else {
+                    winner.isAttacking = false;
+                    loser.health = 0;
+                    // End the game after a small delay to let the animation finish
+                    fatalityTimeoutId = setTimeout(() => {
+                        const winnerName = winner === player1 ? player1.name : player2.name;
+                        endGame(winnerName);
+                    }, 2500); // 2.5 seconds delay
+                }
             }
 
             function animate() {
@@ -942,17 +917,23 @@
                 // Draw ground
                 ctx.fillStyle = '#333';
                 ctx.fillRect(0, groundY, canvasWidth, canvasHeight - groundY);
-
+                
                 // Draw platforms
                 ctx.fillStyle = '#6b7280';
                 platforms.forEach(platform => {
                     ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
                 });
-
+                
                 if (fatalityAnimationActive) {
-                    // Fatality animation logic would go here
-                    // This is a placeholder as PNGs dont support the old animation
+                    playFatalityAnimation();
+                    player1.update();
+                    player2.update();
+                    if (detachedHead) {
+                        detachedHead.update();
+                        detachedHead.draw();
+                    }
                 } else if (fatalityMode) {
+                    // Stop movement in fatality mode
                     player1.velocity.x = 0;
                     player2.velocity.x = 0;
                     player1.update();
@@ -970,21 +951,13 @@
                     if (keys[player2.keysConfig.left]) { player2.velocity.x = -moveSpeed; player2.direction = 'left'; }
                     if (keys[player2.keysConfig.right]) { player2.velocity.x = moveSpeed; player2.direction = 'right'; }
                     if (keys[player2.keysConfig.jump]) { player2.jump(); }
-
-                    // Flip player direction based on opponent's position
-                    if (player1.x < player2.x) {
-                        player1.direction = 'right';
-                        player2.direction = 'left';
-                    } else {
-                        player1.direction = 'left';
-                        player2.direction = 'right';
-                    }
-
+                    
                     player1.update();
                     player2.update();
-
+                    
                     // Check attack collision
                     const checkCollision = (attacker, defender, attack) => {
+                        // Calcula a posição de ataque com base na direção do atacante
                         const attackX = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x - attack.width;
                         const attackY = attacker.y + attack.yOffset;
                         if (
@@ -997,11 +970,11 @@
                         }
                     };
 
-                    if (keys[player1.keysConfig.punch]) {
-                        const attack = player1.punch();
+                    if (keys[player1.keysConfig.punch]) { 
+                        const attack = player1.punch(); 
                         if (attack) checkCollision(player1, player2, attack);
                     }
-                    if (keys[player1.keysConfig.kick]) {
+                    if (keys[player1.keysConfig.kick]) { 
                         const attack = player1.kick();
                         if (attack) checkCollision(player1, player2, attack);
                     }
@@ -1038,10 +1011,10 @@
                         }
                     });
                 }
-
+                
                 updateHealthBars();
                 timerDisplay.innerText = timer;
-
+                
                 // Check fatality condition
                 if (player1.health <= 10 && !fatalityMode && !fatalityAnimationActive) {
                     fatalityMode = true;
@@ -1054,83 +1027,53 @@
                     fatalitySynth.triggerAttackRelease("C4", "1s");
                 }
 
-                if (player1.health <= 0) { endGame(player2.name); }
-                if (player2.health <= 0) { endGame(player1.name); }
-
+                if (player1.health <= 0 && !fatalityAnimationActive) { endGame(player2.name); }
+                if (player2.health <= 0 && !fatalityAnimationActive) { endGame(player1.name); }
+                
                 animationFrameId = requestAnimationFrame(animate);
             }
-
+            
             document.addEventListener('keydown', (e) => {
                 if (!gameStarted) return;
                 keys[e.key] = true;
                 keys[e.key.toLowerCase()] = true;
-
+                
                 if (fatalityMode && !fatalityAnimationActive) {
-                    if (e.key.toLowerCase() === 'x' && player1.health > 0) {
-                        fatalityAnimationActive = true;
-                        endGame(player1.name); // Finaliza o jogo na Fatality
+                    if (e.key.toLowerCase() === 'x') {
+                        if (player2.health > 0) {
+                            fatalityAnimationActive = true;
+                            animationStep = 0;
+                            winner = player1;
+                            loser = player2;
+                        }
                     }
-                    if (e.key.toLowerCase() === 'i' && player2.health > 0) {
-                        fatalityAnimationActive = true;
-                        endGame(player2.name); // Finaliza o jogo na Fatality
+                    if (e.key.toLowerCase() === 'i') {
+                         if (player1.health > 0) {
+                            fatalityAnimationActive = true;
+                            animationStep = 0;
+                            winner = player2;
+                            loser = player1;
+                         }
                     }
                 }
             });
-
+            
             document.addEventListener('keyup', (e) => {
                 if (!gameStarted) return;
                 keys[e.key] = false;
                 keys[e.key.toLowerCase()] = false;
             });
 
-            // UI Button Handlers
-            mainButton.addEventListener('click', showCharacterSelectionScreen);
+            // Set up initial and end game button handlers
+            mainButton.addEventListener('click', initGame);
             controlsButton.addEventListener('click', showControlsScreen);
             backToHomeFromControls.addEventListener('click', showHomeScreen);
-            confirmSelectionButton.addEventListener('click', initGame);
-            backFromSelectionButton.addEventListener('click', showHomeScreen);
             playAgainButton.addEventListener('click', initGame);
             backToHomeButton.addEventListener('click', showHomeScreen);
-
-            // Populate character selection grids
-            function populateCharSelection(grid, playerNumber) {
-                grid.innerHTML = '';
-                characters.forEach(char => {
-                    const charDiv = document.createElement('div');
-                    charDiv.classList.add('character-option');
-                    charDiv.setAttribute('data-char-name', char.name);
-                    const img = document.createElement('img');
-                    img.src = char.image;
-                    img.alt = char.name;
-                    const charName = document.createElement('div');
-                    charName.classList.add('character-name');
-                    charName.innerText = char.name;
-                    charDiv.append(img, charName);
-
-                    charDiv.addEventListener('click', () => {
-                        document.querySelectorAll(`.character-option.selected-p${playerNumber}`).forEach(el => {
-                            el.classList.remove(`selected-p${playerNumber}`);
-                        });
-                        charDiv.classList.add(`selected-p${playerNumber}`);
-                        if (playerNumber === 1) {
-                            player1SelectedChar = char;
-                            player1CharacterName = char.name;
-                        } else {
-                            player2SelectedChar = char;
-                            player2CharacterName = char.name;
-                        }
-                    });
-                    grid.appendChild(charDiv);
-                });
-            }
-
-            populateCharSelection(player1CharGrid, 1);
-            populateCharSelection(player2CharGrid, 2);
-
+            
             // Show the home screen initially
             showHomeScreen();
         }
     </script>
 </body>
-
 </html>
