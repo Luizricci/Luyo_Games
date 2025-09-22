@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird Clone</title>
+    <link rel="stylesheet" href="flap.css">
+</head>
+<body>
+    <div class="game-info">
+        <div class="score-container">
+            <span id="score-p1" class="player-score">0</span>
+            <span id="name-p1" class="player-name">P1</span>
+        </div>
+        <div class="score-container">
+            <span id="score-p2" class="player-score">0</span>
+            <span id="name-p2" class="player-name">P2</span>
+        </div>
+    </div>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="480" height="640"></canvas>
+        
+        <div id="startOverlay" class="overlay active">
+            <h2>Flappy Bird</h2>
+            <p>P1: Tecla 'W'<br>P2: Tecla 'Enter'</p>
+            <input type="text" id="player1Name" class="name-input" placeholder="Nome do Jogador 1">
+            <div class="color-selector">
+                <label for="player1Color">Cor do Pássaro 1:</label>
+                <input type="color" id="player1Color" value="#FFD700">
+            </div>
+            <input type="text" id="player2Name" class="name-input" placeholder="Nome do Jogador 2">
+            <div class="color-selector">
+                <label for="player2Color">Cor do Pássaro 2:</label>
+                <input type="color" id="player2Color" value="#C0C0C0">
+            </div>
+            <div class="mode-selector">
+                <input type="radio" id="modeNormal" name="gameMode" value="normal" checked>
+                <label for="modeNormal">Normal</label>
+                <input type="radio" id="modeUltra" name="gameMode" value="ultra">
+                <label for="modeUltra">Ultra</label>
+            </div>
+            <button class="start-button" id="startButton">Iniciar Jogo</button>
+        </div>
+        
+        <div id="countdownOverlay" class="overlay">
+            <span id="countdown">5</span>
+        </div>
+        
+        <div id="gameOverOverlay" class="overlay">
+            <h2>Fim de Jogo</h2>
+            <p><span id="finalName1"></span>: <span id="finalScore1">0</span> pontos</p>
+            <p><span id="finalName2"></span>: <span id="finalScore2">0</span> pontos</p>
+            <h3 id="winnerMessage"></h3>
+            <button class="start-button" id="restartButton">Reiniciar</button>
+            <button class="start-button" id="backToStartButton" style="margin-top: 10px;">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <script src="flap.js"></script>
+</body>
+</html>

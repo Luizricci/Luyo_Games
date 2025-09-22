@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake 2-Player</title>
+    <link rel="stylesheet" href="snake.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="600" height="600"></canvas>
+        <div id="startOverlay" class="overlay">
+            <h2>Snake 1v1</h2>
+            <div class="player-inputs">
+                <div class="player-input-row">
+                    <input type="text" id="player1NameInput" placeholder="Jogador 1 (WASD)">
+                    <input type="color" id="player1ColorInput" value="#66FF66">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" id="player2NameInput" placeholder="Jogador 2 (Setas)">
+                    <input type="color" id="player2ColorInput" value="#FFD700">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="modeSelector">Modo de Jogo:</label>
+                <select id="modeSelector" class="player-inputs input-row" style="padding: 5px; border-radius: 5px; border: 2px solid #000; font-family: 'Press Start 2P', cursive;">
+                    <option value="Normal">Normal</option>
+                    <option value="Ultra">Ultra</option>
+                </select>
+            </div>
+            <button id="startButton" class="start-button">Iniciar</button>
+        </div>
+        <div id="countdownOverlay" class="overlay hidden">
+            <h2 class="countdown"></h2>
+        </div>
+        <div id="gameOverOverlay" class="overlay hidden">
+            <h2>Fim de Jogo</h2>
+            <p id="winnerMessage" class="winner-text">Vencedor: Ninguém</p>
+            <button id="restartButton" class="restart-button">Reiniciar</button>
+            <button id="backButton" class="back-button">Voltar ao Início</button>
+        </div>
+        <div id="scoreDisplay" class="score-display hidden">
+            <span id="player1ScoreDisplay">P1: 0</span>
+            <span id="player2ScoreDisplay">P2: 0</span>
+        </div>
+    </div>
+
+    <script src="snake.js"></script>
+</body>
+</html>

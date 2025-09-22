@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Mortal Kombat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.58/build/Tone.js"></script>
+    <link rel="stylesheet" href="luta.css">
+</head>
+<body>
+    <div id="finishHim">FATALITY!</div>
+    <div id="messageBox" class="message-container">
+        <div id="homeScreenContent">
+            <h2 class="home-title">MORTAL KOMBAT</h2>
+            <p class="subtitle">Insira o nome dos jogadores:</p>
+            <div class="input-group">
+                <input type="text" id="player1NameInput" placeholder="JOGADOR 1" maxlength="10">
+                <input type="text" id="player2NameInput" placeholder="JOGADOR 2" maxlength="10">
+            </div>
+            <div class="button-group">
+                <button id="mainButton">Começar</button>
+                <button id="controlsButton">Controles</button>
+            </div>
+        </div>
+        <div id="controlsScreenContent" style="display: none;">
+            <h2 class="home-title" style="text-shadow: 2px 2px #4b5563;">Controles</h2>
+            <div class="controls">
+                <div class="player-controls">
+                    <p>• Jogador 1:</p>
+                    <p>Mover: <span class="key">A, D</span></p>
+                    <p>Pular: <span class="key">W</span></p>
+                    <p>Bloquear: <span class="key">S</span></p>
+                    <p>Ataques: <span class="key">Q</span> (soco), <span class="key">E</span> (chute)</p>
+                    <p>Golpe Especial: <span class="fatality-key">X</span></p>
+                </div>
+                <div class="player-controls">
+                    <p>• Jogador 2:</p>
+                    <p>Mover: <span class="key">Setas Direcionais</span></p>
+                    <p>Pular: <span class="key">Seta para Cima</span></p>
+                    <p>Bloquear: <span class="key">Seta para Baixo</span></p>
+                    <p>Ataques: <span class="key">K</span> (soco), <span class="key">L</span> (chute)</p>
+                    <p>Golpe Especial: <span class="fatality-key">I</span></p>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="backToHomeFromControls">Voltar</button>
+            </div>
+        </div>
+        <div id="endGameContent" style="display: none;">
+            <h2 class="home-title" id="endGameTitle"></h2>
+            <div class="button-group">
+                <button id="playAgainButton">Jogar Novamente</button>
+                <button id="backToHomeButton">Voltar para Início</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container" style="display:none;">
+        <div class="ui-container">
+            <div class="player-info">
+                <div class="player-name" id="player1Name"></div>
+                <div class="health-bar-container p1">
+                    <div id="player1HealthBar"></div>
+                </div>
+                <div class="stamina-bar-container p1">
+                    <div id="player1StaminaBar"></div>
+                </div>
+            </div>
+            <div id="timer"></div>
+            <div class="player-info p2">
+                <div class="player-name p2" id="player2Name"></div>
+                <div class="health-bar-container">
+                    <div id="player2HealthBar"></div>
+                </div>
+                <div class="stamina-bar-container">
+                    <div id="player2StaminaBar"></div>
+                </div>
+            </div>
+            </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <script src="luta.js"></script>
+</body>
+</html>

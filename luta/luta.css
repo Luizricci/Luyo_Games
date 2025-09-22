@@ -1,0 +1,303 @@
+:root {
+    --player1-color: #ff3300;
+    --player2-color: #00aaff;
+    --body-color: #f1c27d;
+    --p1-trunk-color: #2980b9;
+    --p2-trunk-color: #9b59b6;
+    --p1-pants-color: #2ecc71;
+    --p2-pants-color: #f39c12;
+    --punch-color: #ffff00;
+    --kick-color: #ff9900;
+    --fireball-color: #ff0000;
+    --stamina-color: #33ff33;
+    --bg-color: #1a1a1a;
+    --ui-color: #e5e7eb;
+    --button-start-color: #ffcc00;
+    --button-end-color: #ffaa00;
+    --button-text-color: #000;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #252525;
+    color: var(--ui-color);
+    font-family: 'Press Start 2P', cursive;
+    padding: 10px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    background: var(--bg-color);
+    border: 5px solid #000;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+    max-width: 90%;
+    width: 800px;
+    box-sizing: content-box;
+}
+
+@media (max-width: 850px) {
+    .game-container {
+        width: 95%;
+    }
+}
+
+.ui-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 5px;
+}
+
+.health-bar-container, .stamina-bar-container {
+    width: 45%;
+    height: 25px;
+    background-color: #4b5563;
+    border: 2px solid #9ca3af;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.stamina-bar-container {
+    height: 12px;
+    border-color: var(--stamina-color);
+    margin-top: 5px;
+}
+
+#player1HealthBar, #player2HealthBar, #player1StaminaBar, #player2StaminaBar {
+    height: 100%;
+    width: 100%;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#player1HealthBar { background-color: var(--player1-color); }
+#player2HealthBar { background-color: var(--player2-color); left: auto; right: 0; }
+#player1StaminaBar { background-color: var(--stamina-color); }
+#player2StaminaBar { background-color: var(--stamina-color); left: auto; right: 0; }
+
+.health-bar-container.p1, .stamina-bar-container.p1 { transform: scaleX(-1); }
+.health-bar-container.p1 #player1HealthBar, .stamina-bar-container.p1 #player1StaminaBar { transform: scaleX(-1); }
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    align-items: flex-start;
+}
+.player-info.p2 { align-items: flex-end; }
+
+.player-name {
+    font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+    margin-bottom: 5px;
+    text-shadow: 1px 1px #000;
+}
+.player-name.p2 { text-align: right; }
+
+#timer {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--ui-color);
+    text-shadow: 1px 1px #000;
+    width: 80px;
+    text-align: center;
+}
+
+#gameCanvas {
+    background-image: url('https://placehold.co/800x450/111/444?text=Arena+MK');
+    background-size: cover;
+    border: 4px solid #4b5563;
+    border-radius: 8px;
+    touch-action: none;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+}
+
+.message-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2d3748;
+    padding: 30px; 
+    border-radius: 12px;
+    border: 5px solid black;
+    z-index: 10;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    max-width: 600px;
+    width: 90%;
+    max-height: 95vh;
+    overflow-y: auto; 
+    animation: fadeIn 0.5s ease-in-out;
+    color: var(--ui-color);
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    .message-container {
+        max-width: 800px;
+    }
+    .message-container .controls {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+}
+
+.home-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 3px 3px 0 #8b0000, 
+                 6px 6px 0 #ffa500;
+}
+
+.message-container .subtitle {
+    font-size: clamp(0.9rem, 2vw, 1.5rem);
+    color: #cbd5e1;
+    margin-bottom: 20px; 
+    text-shadow: 1px 1px #000;
+}
+
+.message-container p {
+    font-size: clamp(0.7rem, 1.5vw, 1.1rem);
+    margin-bottom: 10px; 
+    color: #e5e7eb;
+    line-height: 1.5;
+    text-shadow: 1px 1px #000;
+}
+
+.message-container .controls {
+    margin-top: 20px; 
+    text-align: left;
+    padding: 0 10px;
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message-container .controls .player-controls {
+    background-color: #4b5563;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #6b7280;
+    flex: 1;
+}
+
+.message-container .key {
+    color: #fca5a5;
+    text-shadow: 1px 1px #000;
+}
+
+.message-container .fatality-key {
+     color: #ff0000;
+     font-weight: bold;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    background-color: #374151;
+    border: 2px solid #6b7280;
+    border-radius: 5px;
+    color: var(--ui-color);
+    font-family: 'Press Start 2P', cursive;
+    padding: 8px;
+    font-size: clamp(0.7rem, 1.5vw, 1rem);
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.message-container button {
+    background: linear-gradient(180deg, var(--button-start-color), var(--button-end-color));
+    color: var(--button-text-color);
+    border: 3px solid #000;
+    padding: 12px 25px;
+    font-family: 'Press Start 2P', cursive;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: clamp(0.9rem, 2vw, 1.2rem);
+    box-shadow: 0 6px 0 #8b0000, 0 8px 10px rgba(0,0,0,0.5);
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    flex: 1;
+}
+
+#controlsButton, #backToHomeFromControls {
+     background: #4b5563;
+     box-shadow: 0 6px 0 #2d3748, 0 8px 10px rgba(0,0,0,0.5);
+     color: var(--ui-color);
+     border-color: #000;
+}
+
+#controlsButton:active, #backToHomeFromControls:active {
+    box-shadow: 0 2px 0 #2d3748;
+}
+
+@media (min-width: 768px) {
+    .button-group {
+        flex-direction: row;
+    }
+}
+
+.message-container button:hover {
+    box-shadow: 0 4px 0 #8b0000, 0 6px 8px rgba(0,0,0,0.5);
+}
+
+.message-container button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #8b0000;
+}
+
+#finishHim {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: #ff0000;
+    text-shadow: 3px 3px #000;
+    animation: pulse 1s infinite;
+    display: none;
+    z-index: 10;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
