@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man 2-Player</title>
+    <link rel="stylesheet" href="pacman.css">
+</head>
+<body>
+    <div class="back-button">
+        <a href="../game_hub/game_hub.html" class="back-link">
+            <span class="arrow">←</span> Voltar ao Menu
+        </a>
+    </div>
+
+    <div class="game-container">
+        <canvas id="gameCanvas" width="456" height="480"></canvas>
+        <div id="startOverlay" class="overlay">
+            <h2>Pac-Man 1v1</h2>
+            <div class="player-inputs">
+                <div class="player-input-row">
+                    <input type="text" id="player1NameInput" placeholder="Jogador 1 (WASD)">
+                    <input type="color" id="player1ColorInput" value="#FFFF00">
+                </div>
+                <div class="player-input-row">
+                    <input type="text" id="player2NameInput" placeholder="Jogador 2 (Setas)">
+                    <input type="color" id="player2ColorInput" value="#FFA500">
+                </div>
+            </div>
+            <button id="startButton" class="start-button">Iniciar</button>
+        </div>
+        <div id="countdownOverlay" class="overlay hidden">
+            <h2 class="countdown"></h2>
+        </div>
+        <div id="gameOverOverlay" class="overlay hidden">
+            <h2>Fim de Jogo</h2>
+            <p id="winnerMessage" class="winner-text"></p>
+            <button id="restartButton" class="restart-button">Reiniciar</button>
+            <button id="backButton" class="back-button-overlay">Voltar ao Início</button>
+        </div>
+        <div id="scoreDisplay" class="score-display hidden">
+            <span id="player1ScoreDisplay"></span>
+            <span id="player2ScoreDisplay"></span>
+        </div>
+    </div>
+
+    <script src="pacman.js"></script>
+</body>
+</html>
