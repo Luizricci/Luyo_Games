@@ -7,7 +7,6 @@ window.onload = function() {
     const endGameContent = document.getElementById('endGameContent');
     const mainButton = document.getElementById('mainButton');
     const controlsButton = document.getElementById('controlsButton');
-    const startGameButton = document.getElementById('startGameButton');
     const playAgainButton = document.getElementById('playAgainButton');
     const backToHomeButton = document.getElementById('backToHomeButton');
     const backToHomeFromControls = document.getElementById('backToHomeFromControls');
@@ -55,13 +54,21 @@ window.onload = function() {
     // Variáveis para a seleção de personagens
     let selectedHeadP1 = null;
     let selectedHeadP2 = null;
+    
+    // Sistema de seleção de personagens (baseado no subway)
+    let selectedCharacters = {
+        player1: null,
+        player2: null,
+        player1Name: '',
+        player2Name: ''
+    };
 
     // Define os personagens com o caminho da imagem da cabeça
     const characters = [
-        { name: 'Felipe Dev', img: '../public/felipe.png' },
-        { name: 'Thiago', img: '../public/thiago.png' },
-        { name: 'Marcelo', img: '../public/marcelo.png' },
-        { name: 'Eduardo', img: '../public/eduardo.png' }
+        { name: 'Felipe Dev', img: '../public/cabeca/cabeca2.png' },
+        { name: 'Thiago', img: '../public/cabeca/cabeca4.png' },
+        { name: 'Marcelo', img: '../public/cabeca/cabeca3.png' },
+        { name: 'Eduardo', img: '../public/cabeca/cabeca1.png' }
     ];
 
     // Platforms
@@ -146,11 +153,12 @@ window.onload = function() {
                 return;
             }
             
-            // Draw player name above the head
+            // *** CÓDIGO MODIFICADO: Posição do nome ajustada ***
+            // Draw player name above the head - Posição Y movida de -15 para -20
             ctx.fillStyle = this.playerColor;
             ctx.font = "12px 'Press Start 2P', cursive";
             ctx.textAlign = 'center';
-            ctx.fillText(this.name, this.x + this.width / 2, this.y - 10);
+            ctx.fillText(this.name, this.x + this.width / 2, this.y - 20);
             
             // Base x position for drawing, adjusted for direction
             const baseX = this.direction === 'right' ? this.x : this.x + this.width;
@@ -160,50 +168,65 @@ window.onload = function() {
             ctx.translate(baseX, this.y);
             ctx.scale(xScale, 1);
 
+            // *** CÓDIGO MODIFICADO: Posição da cabeça ajustada ***
             // Head (draw image if available, otherwise draw circle)
             if (this.headImage && this.headImage.complete) {
-                ctx.drawImage(this.headImage, this.width / 2 - 25, 5, 50, 50);
+                // Posição Y da imagem da cabeça movida de 0 para -5
+                ctx.drawImage(this.headImage, this.width / 2 - 25, -5, 50, 50);
             } else {
                 ctx.beginPath();
-                ctx.arc(this.width / 2, 20, 15, 0, Math.PI * 2);
+                // Posição Y do centro do círculo movida de 15 para 10
+                ctx.arc(this.width / 2, 10, 15, 0, Math.PI * 2);
                 ctx.fillStyle = this.bodyColor;
                 ctx.fill();
             }
 
-            // Trunk
+            // *** CÓDIGO MODIFICADO: Posição do tronco ajustada ***
+            // Trunk - Posição Y movida de 35 para 30 para se conectar à cabeça
             ctx.fillStyle = this.trunkColor;
-            ctx.fillRect(this.width / 4, 30, this.width / 2, this.height * 0.4);
+            ctx.fillRect(this.width / 4, 40, this.width / 2, this.height * 0.4);
 
             // Arms
             ctx.fillStyle = this.bodyColor;
             
+            // Animação de soco aprimorada
             if (this.isPunching) {
-                // Braço de soco
-                ctx.fillRect(this.width / 4 + 10, this.height * 0.3, this.width * 0.8, 10);
-                // Braço de trás
-                ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
+                // Braço de soco (estendido e com "mão")
+                ctx.fillRect(this.width / 2, this.height * 0.35, this.width * 0.7, 10); // Braço estendido
+                ctx.fillRect(this.width * 1.2, this.height * 0.35 - 2.5, 15, 15); // "Mão"
+                // Braço de trás (encolhido)
+                ctx.fillRect(this.width / 4 - 5, this.height * 0.35, 10, this.height * 0.2);
             } else {
                 // Braços normais
-                ctx.fillRect(this.width / 4, this.height * 0.3, 10, this.height * 0.3);
-                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.3, 10, this.height * 0.3);
+                ctx.fillRect(this.width / 4, this.height * 0.35, 10, this.height * 0.3);
+                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.35, 10, this.height * 0.3);
             }
 
             // Legs
             ctx.fillStyle = this.pantsColor;
             
+            // Animação de chute aprimorada
             if (this.isKicking) {
-                // Perna de chute
+                // Perna de chute (mais alta e estendida)
                 ctx.save();
-                ctx.translate(this.width * 0.5, this.height * 0.7 + 10);
-                ctx.rotate(Math.PI / 4 * 1.5);
-                ctx.fillRect(-5, -5, 10, this.height * 0.6);
+                ctx.translate(this.width * 0.5, this.height * 0.75);
+                ctx.rotate(-Math.PI / 4); // Angulo do chute ajustado
+                ctx.fillRect(0, -5, this.height * 0.5, 10); // Perna mais longa
                 ctx.restore();
-                // Perna de apoio
-                ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
+                
+                // Perna de apoio (dobrada)
+                ctx.beginPath();
+                ctx.moveTo(this.width * 0.35, this.height * 0.75);
+                ctx.lineTo(this.width * 0.30, this.height * 0.9);
+                ctx.lineTo(this.width * 0.45, this.height);
+                ctx.lineWidth = 10;
+                ctx.strokeStyle = this.pantsColor;
+                ctx.stroke();
+
             } else {
                 // Pernas normais
-                ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
-                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.7, 10, this.height * 0.3);
+                ctx.fillRect(this.width * 0.25, this.height * 0.75, 10, this.height * 0.25);
+                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.75, 10, this.height * 0.25);
             }
             
             ctx.restore();
@@ -399,7 +422,12 @@ window.onload = function() {
         if (timerId) { clearInterval(timerId); }
         if (fatalityTimeoutId) { clearTimeout(fatalityTimeoutId); }
         
+        // CORREÇÃO: Esconder todas as telas e mostrar o jogo
         messageBox.style.display = 'none';
+        homeScreenContent.style.display = 'none';
+        characterSelectionScreenContent.style.display = 'none';
+        controlsScreenContent.style.display = 'none';
+        endGameContent.style.display = 'none';
         gameContainer.style.display = 'flex';
         finishHimDisplay.style.display = 'none';
         
@@ -476,6 +504,12 @@ window.onload = function() {
         detachedHead = null;
         selectedHeadP1 = null;
         selectedHeadP2 = null;
+        
+        // Reset das seleções de personagens
+        selectedCharacters.player1 = null;
+        selectedCharacters.player2 = null;
+        selectedCharacters.player1Name = '';
+        selectedCharacters.player2Name = '';
 
         messageBox.style.display = 'block';
         gameContainer.style.display = 'none';
@@ -503,8 +537,77 @@ window.onload = function() {
         homeScreenContent.style.display = 'none';
         characterSelectionScreenContent.style.display = 'block';
         
-        // Configura a seleção de personagens
+        // Configura a seleção de personagens baseada no subway
         setupCharacterSelection();
+    }
+
+    // Sistema de seleção baseado no subway
+    function setupCharacterSelection() {
+        const confirmBtn = document.getElementById('confirmSelectionBtn');
+        
+        // Inicializa seleções padrão
+        selectedCharacters.player1 = 0; // Felipe
+        selectedCharacters.player2 = 1; // Thiago
+
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const index = parseInt(e.currentTarget.dataset.character);
+                const isPlayer1Selected = selectedCharacters.player1 === index;
+                const isPlayer2Selected = selectedCharacters.player2 === index;
+                
+                if (!isPlayer1Selected && !isPlayer2Selected) {
+                    if (selectedCharacters.player1 === null) {
+                        selectedCharacters.player1 = index;
+                    } else if (selectedCharacters.player2 === null) {
+                        selectedCharacters.player2 = index;
+                    }
+                } else if (isPlayer1Selected) {
+                    selectedCharacters.player1 = null;
+                } else if (isPlayer2Selected) {
+                    selectedCharacters.player2 = null;
+                }
+                updateCharacterSelectionUI();
+            });
+        });
+
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                if (selectedCharacters.player1 !== null && selectedCharacters.player2 !== null) {
+                    // Define as imagens dos personagens selecionados
+                    selectedHeadP1 = characters[selectedCharacters.player1].img;
+                    selectedHeadP2 = characters[selectedCharacters.player2].img;
+                    
+                    // Inicia o jogo
+                    initGame();
+                }
+            });
+        }
+        
+        // Atualiza a UI inicial
+        updateCharacterSelectionUI();
+    }
+
+    function updateCharacterSelectionUI() {
+        const cards = document.querySelectorAll('.character-card');
+        cards.forEach(card => {
+            card.classList.remove('player1-selected', 'player2-selected');
+            card.querySelector('.selection-marker-p1').style.display = 'none';
+            card.querySelector('.selection-marker-p2').style.display = 'none';
+        });
+        
+        if (selectedCharacters.player1 !== null) {
+            cards[selectedCharacters.player1].classList.add('player1-selected');
+            cards[selectedCharacters.player1].querySelector('.selection-marker-p1').style.display = 'block';
+        }
+        if (selectedCharacters.player2 !== null) {
+            cards[selectedCharacters.player2].classList.add('player2-selected');
+            cards[selectedCharacters.player2].querySelector('.selection-marker-p2').style.display = 'block';
+        }
+        
+        const confirmBtn = document.getElementById('confirmSelectionBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled = selectedCharacters.player1 === null || selectedCharacters.player2 === null;
+        }
     }
 
     function updateHealthBars() {
@@ -602,12 +705,26 @@ window.onload = function() {
             player1.isBlocking = keys[player1.keysConfig.block];
             player2.isBlocking = keys[player2.keysConfig.block];
 
-            if (keys[player1.keysConfig.left]) { player1.velocity.x = -moveSpeed; player1.direction = 'left'; }
-            if (keys[player1.keysConfig.right]) { player1.velocity.x = moveSpeed; player1.direction = 'right'; }
+            if (keys[player1.keysConfig.left]) { 
+                player1.velocity.x = -moveSpeed; 
+                player1.direction = 'left'; 
+            }
+            if (keys[player1.keysConfig.right]) { 
+                player1.velocity.x = moveSpeed; 
+                player1.direction = 'right'; 
+            }
             if (keys[player1.keysConfig.jump]) { player1.jump(); }
 
-            if (keys[player2.keysConfig.left]) { player2.velocity.x = -moveSpeed; player2.direction = 'left'; }
-            if (keys[player2.keysConfig.right]) { player2.velocity.x = moveSpeed; player2.direction = 'right'; }
+            if (keys[player2.keysConfig.left]) { 
+                console.log('Moving player2 left - keys object:', keys);
+                player2.velocity.x = -moveSpeed; 
+                player2.direction = 'left'; 
+            }
+            if (keys[player2.keysConfig.right]) { 
+                console.log('Moving player2 right - keys object:', keys);
+                player2.velocity.x = moveSpeed; 
+                player2.direction = 'right'; 
+            }
             if (keys[player2.keysConfig.jump]) { player2.jump(); }
             
             player1.update();
@@ -692,9 +809,38 @@ window.onload = function() {
     }
     
     document.addEventListener('keydown', (e) => {
-        if (!gameStarted) return;
-        keys[e.key] = true;
-        keys[e.key.toLowerCase()] = true;
+        // Controles na tela de seleção de personagens
+        if (characterSelectionScreenContent.style.display === 'block') {
+            if (e.key.toLowerCase() === 'a') {
+                selectedCharacters.player1 = (selectedCharacters.player1 - 1 + characters.length) % characters.length;
+                updateCharacterSelectionUI();
+            } else if (e.key.toLowerCase() === 'd') {
+                selectedCharacters.player1 = (selectedCharacters.player1 + 1) % characters.length;
+                updateCharacterSelectionUI();
+            } else if (e.key === 'ArrowLeft') {
+                selectedCharacters.player2 = (selectedCharacters.player2 - 1 + characters.length) % characters.length;
+                updateCharacterSelectionUI();
+            } else if (e.key === 'ArrowRight') {
+                selectedCharacters.player2 = (selectedCharacters.player2 + 1) % characters.length;
+                updateCharacterSelectionUI();
+            } else if (e.key === 'Enter') {
+                if (selectedCharacters.player1 !== null && selectedCharacters.player2 !== null) {
+                    // Define as imagens dos personagens selecionados
+                    selectedHeadP1 = characters[selectedCharacters.player1].img;
+                    selectedHeadP2 = characters[selectedCharacters.player2].img;
+                    
+                    // Inicia o jogo
+                    initGame();
+                }
+            }
+            return; // Sai da função se estiver na tela de seleção
+        }
+        
+        // Registra teclas durante o jogo
+        if (e.key && gameStarted) {
+            keys[e.key] = true;
+            keys[e.key.toLowerCase()] = true;
+        }
         
         if (fatalityMode && !fatalityAnimationActive) {
             if (e.key.toLowerCase() === 'x' && player1.health > 0 && player2.health <= 10) {
@@ -713,16 +859,21 @@ window.onload = function() {
     });
     
     document.addEventListener('keyup', (e) => {
-        if (!gameStarted) return;
-        keys[e.key] = false;
-        keys[e.key.toLowerCase()] = false;
+        // Ignora keyup se estiver na tela de seleção
+        if (characterSelectionScreenContent.style.display === 'block') {
+            return;
+        }
+        
+        if (e.key) {  // Verifica se a key existe
+            keys[e.key] = false;
+            keys[e.key.toLowerCase()] = false;
+        }
     });
 
     // Set up initial and end game button handlers
     mainButton.removeEventListener('click', showCharacterSelectionScreen);
     mainButton.addEventListener('click', showCharacterSelectionScreen);
     controlsButton.addEventListener('click', showControlsScreen);
-    startGameButton.addEventListener('click', initGame);
     backToHomeFromSelection.addEventListener('click', showHomeScreen);
     backToHomeFromControls.addEventListener('click', showHomeScreen);
     playAgainButton.addEventListener('click', initGame);
@@ -730,112 +881,4 @@ window.onload = function() {
     
     // Show the home screen initially
     showHomeScreen();
-    
-    // Adicione estas variáveis no início do seu arquivo JavaScript:
-    let selectedCharacters = {
-        player1: 0, // Padrão Felipe
-        player2: 1, // Padrão Thiago
-        player1Name: '',
-        player2Name: ''
-    };
-
-    let currentPlayerSelecting = 1; // 1 para player1, 2 para player2
-
-    // Adicione esta função para configurar a seleção de personagens:
-    function setupCharacterSelection() {
-        const cards = document.querySelectorAll('.character-card');
-        const confirmBtn = document.getElementById('confirmSelectionBtn');
-        const backBtn = document.getElementById('backToHomeFromSelection');
-        
-        // Remove event listeners antigos
-        cards.forEach(card => {
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-        });
-        
-        // Adiciona novos event listeners
-        document.querySelectorAll('.character-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const characterIndex = parseInt(card.dataset.character);
-                handleCharacterSelection(characterIndex);
-            });
-        });
-        
-        // Event listener para o botão confirmar
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', () => {
-                // Esconde a seleção de personagens
-                document.getElementById('characterSelectionScreenContent').style.display = 'none';
-                
-                // Aqui você chama sua função original de iniciar o jogo
-                // Substitua 'startGame()' pela sua função real
-                startGameWithSelectedCharacters();
-            });
-        }
-        
-        // Event listener para voltar
-        if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                document.getElementById('characterSelectionScreenContent').style.display = 'none';
-                document.getElementById('homeScreenContent').style.display = 'block';
-            });
-        }
-        
-        // Atualiza a UI inicial
-        updateCharacterSelectionUI();
-    }
-
-    function handleCharacterSelection(characterIndex) {
-        if (currentPlayerSelecting === 1) {
-            selectedCharacters.player1 = characterIndex;
-            currentPlayerSelecting = 2;
-        } else {
-            selectedCharacters.player2 = characterIndex;
-            currentPlayerSelecting = 1;
-        }
-        
-        updateCharacterSelectionUI();
-    }
-
-    function updateCharacterSelectionUI() {
-        const cards = document.querySelectorAll('.character-card');
-        
-        // Reset todas as seleções
-        cards.forEach(card => {
-            card.classList.remove('player1-selected', 'player2-selected');
-            const p1Marker = card.querySelector('.selection-marker-p1');
-            const p2Marker = card.querySelector('.selection-marker-p2');
-            if (p1Marker) p1Marker.style.display = 'none';
-            if (p2Marker) p2Marker.style.display = 'none';
-        });
-        
-        // Aplica seleções atuais
-        if (selectedCharacters.player1 !== null && cards[selectedCharacters.player1]) {
-            cards[selectedCharacters.player1].classList.add('player1-selected');
-            const p1Marker = cards[selectedCharacters.player1].querySelector('.selection-marker-p1');
-            if (p1Marker) p1Marker.style.display = 'block';
-        }
-        
-        if (selectedCharacters.player2 !== null && cards[selectedCharacters.player2]) {
-            cards[selectedCharacters.player2].classList.add('player2-selected');
-            const p2Marker = cards[selectedCharacters.player2].querySelector('.selection-marker-p2');
-            if (p2Marker) p2Marker.style.display = 'block';
-        }
-        
-        // Atualiza botão de confirmação
-        const confirmBtn = document.getElementById('confirmSelectionBtn');
-        if (confirmBtn) {
-            confirmBtn.disabled = selectedCharacters.player1 === null || selectedCharacters.player2 === null;
-        }
-    }
-
-    // Esta função deve chamar sua função original de iniciar o jogo
-    function startGameWithSelectedCharacters() {
-        // Define as imagens dos personagens selecionados
-        selectedHeadP1 = characters[selectedCharacters.player1].img;
-        selectedHeadP2 = characters[selectedCharacters.player2].img;
-        
-        // Inicia o jogo original
-        initGame();
-    }
 }
