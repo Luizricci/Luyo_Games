@@ -390,28 +390,70 @@ window.onload = function() {
             this.velocity = { x: velocityX, y: velocityY };
             this.image = image;
             this.imageSize = 50;
+            // Propriedades para rotação/rolagem
+            this.angle = 0; // em radianos
+            this.angularVelocity = 0; // rad/s (aprox por frame)
         }
 
         draw() {
             if (this.image && this.image.complete) {
-                ctx.drawImage(this.image, this.x - this.imageSize / 2, this.y - this.imageSize / 2, this.imageSize, this.imageSize);
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.drawImage(this.image, -this.imageSize / 2, -this.imageSize / 2, this.imageSize, this.imageSize);
+                ctx.restore();
             } else {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
                 ctx.fillStyle = this.color;
                 ctx.fill();
+                ctx.restore();
             }
         }
 
         update() {
+            // Gravidade/colisão com chão
             if (this.y + this.size < groundY) {
                 this.velocity.y += gravity;
+                // no ar, uma leve dissipação para evitar spin excessivo
+                this.angularVelocity *= 0.995;
             } else {
+                // Ao tocar o chão, fixa no plano e aplica atrito
                 this.velocity.y = 0;
                 this.y = groundY - this.size;
+                // Atrito linear mais leve e amortecimento angular
+                const linearFriction = 0.985;
+                const angularDamping = 0.99;
+                this.velocity.x *= linearFriction;
+                this.angularVelocity *= angularDamping;
+                // Rolagem natural: aproxima velocidade angular alvo (omega = v/r)
+                const r = this.size;
+                const omegaTarget = this.velocity.x / r; // rolagem sem escorregar
+                // interpola suavemente para evitar giros rápidos
+                this.angularVelocity += (omegaTarget - this.angularVelocity) * 0.08;
+                // Clamps para parar jitter
+                if (Math.abs(this.velocity.x) < 0.02) this.velocity.x = 0;
+                if (Math.abs(this.angularVelocity) < 0.005) this.angularVelocity = 0;
             }
+
+            // Colisão simples com paredes (bordas do canvas)
+            if (this.x - this.size <= 0 && this.velocity.x < 0) {
+                this.x = this.size;
+                this.velocity.x *= -0.5; // rebate com perda
+                this.angularVelocity *= 0.8;
+            }
+            if (this.x + this.size >= canvas.width && this.velocity.x > 0) {
+                this.x = canvas.width - this.size;
+                this.velocity.x *= -0.5;
+                this.angularVelocity *= 0.8;
+            }
+
             this.x += this.velocity.x;
             this.y += this.velocity.y;
+            this.angle += this.angularVelocity;
         }
     }
 
@@ -646,14 +688,18 @@ window.onload = function() {
 
             // Detach head at a specific step
             if (animationStep === headDetachStep && detachedHead === null) {
+                const initialVX = loser.direction === 'right' ? 6 : -6; // impulso lateral
+                const initialVY = -7; // impulso vertical
                 detachedHead = new Head({
                     x: loser.x + loser.width / 2,
-                    y: loser.y + 20,
+                    y: loser.y + 10, // ligeiramente mais baixo para melhor saída
                     color: getComputedStyle(document.documentElement).getPropertyValue('--body-color'),
-                    velocityX: loser.direction === 'right' ? 3 : -3,
-                    velocityY: -5,
+                    velocityX: initialVX,
+                    velocityY: initialVY,
                     image: loser.headImage
                 });
+                // Rotação inicial mais sutil
+                detachedHead.angularVelocity = (initialVX / detachedHead.size) * 0.15;
                 loser.isDead = true; // Mark loser as dead so no body is drawn
             }
 
