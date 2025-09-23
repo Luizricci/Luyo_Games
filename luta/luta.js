@@ -377,9 +377,11 @@ window.onload = function() {
                     this.isAttacking = false;
                     this.isKicking = false;
                 }, 200);
-                // Hitbox mais curta para evitar acertos de longe
-                const crouchAdjust = this.isCrouching ? 45 : 0;
-                return { damage: 15, range: 35, yOffset: 120 + crouchAdjust, height: 14, width: 36 };
+                // Hitbox ajustada para chute (mais tolerante verticalmente)
+                const crouchAdjust = this.isCrouching ? 50 : 0;
+                // Quando agachado, o chute costuma sair mais baixo, então altura maior ajuda a não perder
+                const height = this.isCrouching ? 18 : 16;
+                return { damage: 15, range: 35, yOffset: 115 + crouchAdjust, height, width: 38 };
             }
             return null;
         }
@@ -835,23 +837,21 @@ window.onload = function() {
             const checkCollision = (attacker, defender, attack) => {
                 // Usa hitbox efetiva do defensor (considera crouch)
                 const def = defender.getHitbox();
-                // Janela vertical do golpe
-                const attackY = attacker.y + attack.yOffset;
-                const verticalOverlap =
-                    attackY + attack.height >= def.y &&
-                    attackY <= def.y + def.height;
-
-                if (!verticalOverlap) return;
-
-                // Distância horizontal entre a frente do atacante e a frente do defensor
-                const attackerFront = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x;
-                const defenderFront = attacker.direction === 'right' ? def.x : def.x + def.width;
-                const horizontalGap = attacker.direction === 'right'
-                    ? defenderFront - attackerFront
-                    : attackerFront - defenderFront;
-
-                // Só conta se o defensor estiver à frente e dentro do alcance declarado
-                if (horizontalGap >= 0 && horizontalGap <= attack.range) {
+                // Retângulo de ataque baseado no alcance
+                const attackRect = {
+                    x: attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x - attack.range,
+                    y: attacker.y + attack.yOffset,
+                    width: attack.range,
+                    height: attack.height
+                };
+                // Interseção de retângulos
+                const intersects = (
+                    attackRect.x <= def.x + def.width &&
+                    attackRect.x + attackRect.width >= def.x &&
+                    attackRect.y <= def.y + def.height &&
+                    attackRect.y + attackRect.height >= def.y
+                );
+                if (intersects) {
                     defender.takeHit(attack.damage);
                 }
             };
