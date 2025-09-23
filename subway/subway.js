@@ -148,7 +148,10 @@ function updateGameObjects() {
     const now = Date.now();
     
     const totalScore = players[0].score + players[1].score;
-    gameSpeed = baseSpeed + (totalScore * 0.05);
+    gameSpeed = baseSpeed + (totalScore * 0.01); 
+    
+    const maxSpeed = baseSpeed * 3; 
+    gameSpeed = Math.min(gameSpeed, maxSpeed);
     
     roadOffset = (roadOffset + gameSpeed) % (60 + 40);
 
@@ -237,10 +240,14 @@ function checkCollisions() {
         }
     });
 
-    players.forEach(player => {
-        if (!player.alive) return;
-        for (let i = coins.length - 1; i >= 0; i--) {
-            const coin = coins[i];
+    
+    for (let i = coins.length - 1; i >= 0; i--) {
+        const coin = coins[i];
+        let playersWhoGotCoin = [];
+        
+        players.forEach(player => {
+            if (!player.alive) return;
+            
             const playerRect = {
                 x: player.x - player.width / 2,
                 y: player.y - player.height / 2,
@@ -258,11 +265,20 @@ function checkCollisions() {
                 playerRect.x + playerRect.width > coinRect.x &&
                 playerRect.y < coinRect.y + coinRect.height &&
                 playerRect.y + playerRect.height > coinRect.y) {
-                player.score += 10;
-                coins.splice(i, 1);
+                playersWhoGotCoin.push(player);
             }
+        });
+        
+
+        if (playersWhoGotCoin.length > 0) {
+
+            playersWhoGotCoin.forEach(player => {
+                player.score += 10;
+            });
+            
+            coins.splice(i, 1);
         }
-    });
+    }
 }
 
 function showGameOver() {

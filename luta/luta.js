@@ -2,13 +2,16 @@ window.onload = function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const homeScreenContent = document.getElementById('homeScreenContent');
+    const characterSelectionScreenContent = document.getElementById('characterSelectionScreenContent');
     const controlsScreenContent = document.getElementById('controlsScreenContent');
     const endGameContent = document.getElementById('endGameContent');
     const mainButton = document.getElementById('mainButton');
     const controlsButton = document.getElementById('controlsButton');
+    const startGameButton = document.getElementById('startGameButton');
     const playAgainButton = document.getElementById('playAgainButton');
     const backToHomeButton = document.getElementById('backToHomeButton');
     const backToHomeFromControls = document.getElementById('backToHomeFromControls');
+    const backToHomeFromSelection = document.getElementById('backToHomeFromSelection');
     const endGameTitle = document.getElementById('endGameTitle');
     const messageBox = document.getElementById('messageBox');
     const gameContainer = document.querySelector('.game-container');
@@ -22,6 +25,8 @@ window.onload = function() {
     const player2NameDisplay = document.getElementById('player2Name');
     const timerDisplay = document.getElementById('timer');
     const finishHimDisplay = document.getElementById('finishHim');
+    const player1SelectionGrid = document.getElementById('player1SelectionGrid');
+    const player2SelectionGrid = document.getElementById('player2SelectionGrid');
 
     // Game settings
     const canvasWidth = 800;
@@ -46,6 +51,18 @@ window.onload = function() {
     let animationFrameId;
     let fatalityTimeoutId;
     let detachedHead = null;
+
+    // Variáveis para a seleção de personagens
+    let selectedHeadP1 = null;
+    let selectedHeadP2 = null;
+
+    // Define os personagens com o caminho da imagem da cabeça
+    const characters = [
+        { name: 'Felipe Dev', img: '../public/felipe.png' },
+        { name: 'Thiago', img: '../public/thiago.png' },
+        { name: 'Marcelo', img: '../public/marcelo.png' },
+        { name: 'Eduardo', img: '../public/eduardo.png' }
+    ];
 
     // Platforms
     const platforms = [
@@ -90,7 +107,7 @@ window.onload = function() {
 
     // Player class
     class Player {
-        constructor({ x, y, playerColor, keysConfig, direction, trunkColor, pantsColor, name }) {
+        constructor({ x, y, playerColor, keysConfig, direction, trunkColor, pantsColor, name, headImagePath }) {
             this.x = x;
             this.y = y;
             this.width = 60; // Tamanho ajustado para proporções melhores
@@ -114,6 +131,14 @@ window.onload = function() {
             this.direction = direction;
             this.isPunching = false;
             this.isKicking = false;
+            
+            // Carrega a imagem da cabeça se um caminho for fornecido
+            this.headImage = new Image();
+            if (headImagePath) {
+                this.headImage.src = headImagePath;
+            } else {
+                this.headImage = null; // Garante que a imagem não é carregada se não houver caminho
+            }
         }
 
         draw() {
@@ -135,8 +160,10 @@ window.onload = function() {
             ctx.translate(baseX, this.y);
             ctx.scale(xScale, 1);
 
-            // Head
-            if (!this.isDead) {
+            // Head (draw image if available, otherwise draw circle)
+            if (this.headImage && this.headImage.complete) {
+                ctx.drawImage(this.headImage, this.width / 2 - 25, 5, 50, 50);
+            } else {
                 ctx.beginPath();
                 ctx.arc(this.width / 2, 20, 15, 0, Math.PI * 2);
                 ctx.fillStyle = this.bodyColor;
@@ -174,7 +201,7 @@ window.onload = function() {
                 // Perna de apoio
                 ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
             } else {
-                 // Pernas normais
+                // Pernas normais
                 ctx.fillRect(this.width * 0.25, this.height * 0.7, 10, this.height * 0.3);
                 ctx.fillRect(this.width * 0.75 - 10, this.height * 0.7, 10, this.height * 0.3);
             }
@@ -332,19 +359,25 @@ window.onload = function() {
 
     // Head class for fatality animation
     class Head {
-        constructor({ x, y, color, velocityX, velocityY }) {
+        constructor({ x, y, color, velocityX, velocityY, image }) {
             this.x = x;
             this.y = y;
             this.size = 20;
             this.color = color;
             this.velocity = { x: velocityX, y: velocityY };
+            this.image = image;
+            this.imageSize = 50;
         }
 
         draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.fill();
+            if (this.image && this.image.complete) {
+                ctx.drawImage(this.image, this.x - this.imageSize / 2, this.y - this.imageSize / 2, this.imageSize, this.imageSize);
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
         }
 
         update() {
@@ -362,25 +395,11 @@ window.onload = function() {
     let player1, player2;
 
     function initGame() {
-        // Checa se os nomes dos jogadores foram inseridos
-        const p1Name = player1NameInput.value.trim() || 'JOGADOR 1';
-        const p2Name = player2NameInput.value.trim() || 'JOGADOR 2';
-
-        if (!p1Name || !p2Name) {
-            // Se algum nome estiver faltando, não inicia o jogo e retorna
-            return;
-        }
-
         if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
         if (timerId) { clearInterval(timerId); }
-
-        player1NameDisplay.innerText = p1Name;
-        player2NameDisplay.innerText = p2Name;
-
+        if (fatalityTimeoutId) { clearTimeout(fatalityTimeoutId); }
+        
         messageBox.style.display = 'none';
-        homeScreenContent.style.display = 'none';
-        controlsScreenContent.style.display = 'none';
-        endGameContent.style.display = 'none';
         gameContainer.style.display = 'flex';
         finishHimDisplay.style.display = 'none';
         
@@ -391,8 +410,10 @@ window.onload = function() {
             pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-pants-color'),
             keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'z' },
             direction: 'right',
-            name: p1Name
+            name: selectedCharacters.player1Name || player1NameInput.value.trim() || 'JOGADOR 1',
+            headImagePath: selectedHeadP1
         });
+        
         player2 = new Player({
             x: canvasWidth - 140, y: groundY - 120,
             playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player2-color'),
@@ -400,8 +421,12 @@ window.onload = function() {
             pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p2-pants-color'),
             keysConfig: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', block: 'ArrowDown', punch: 'k', kick: 'l', fireball: 'j' },
             direction: 'left',
-            name: p2Name
+            name: selectedCharacters.player2Name || player2NameInput.value.trim() || 'JOGADOR 2',
+            headImagePath: selectedHeadP2
         });
+
+        player1NameDisplay.innerText = player1.name;
+        player2NameDisplay.innerText = player2.name;
 
         gameStarted = true;
         gameOver = false;
@@ -430,6 +455,7 @@ window.onload = function() {
         
         homeScreenContent.style.display = 'none';
         controlsScreenContent.style.display = 'none';
+        characterSelectionScreenContent.style.display = 'none';
         endGameContent.style.display = 'block';
 
         endGameTitle.innerText = winner ? `${winner} Venceu!` : 'Empate!';
@@ -447,6 +473,9 @@ window.onload = function() {
         keys = {};
         projectiles = [];
         timer = 99;
+        detachedHead = null;
+        selectedHeadP1 = null;
+        selectedHeadP2 = null;
 
         messageBox.style.display = 'block';
         gameContainer.style.display = 'none';
@@ -454,12 +483,28 @@ window.onload = function() {
         
         controlsScreenContent.style.display = 'none';
         endGameContent.style.display = 'none';
+        characterSelectionScreenContent.style.display = 'none';
         homeScreenContent.style.display = 'block';
     }
     
     function showControlsScreen() {
         homeScreenContent.style.display = 'none';
         controlsScreenContent.style.display = 'block';
+    }
+
+    function showCharacterSelectionScreen() {
+        const p1Name = player1NameInput.value.trim();
+        const p2Name = player2NameInput.value.trim();
+        
+        // Armazena os nomes
+        selectedCharacters.player1Name = p1Name || 'JOGADOR 1';
+        selectedCharacters.player2Name = p2Name || 'JOGADOR 2';
+        
+        homeScreenContent.style.display = 'none';
+        characterSelectionScreenContent.style.display = 'block';
+        
+        // Configura a seleção de personagens
+        setupCharacterSelection();
     }
 
     function updateHealthBars() {
@@ -503,7 +548,8 @@ window.onload = function() {
                     y: loser.y + 20,
                     color: getComputedStyle(document.documentElement).getPropertyValue('--body-color'),
                     velocityX: loser.direction === 'right' ? 3 : -3,
-                    velocityY: -5
+                    velocityY: -5,
+                    image: loser.headImage
                 });
                 loser.isDead = true; // Mark loser as dead so no body is drawn
             }
@@ -628,12 +674,12 @@ window.onload = function() {
         timerDisplay.innerText = timer;
         
         // Check fatality condition
-        if (player1.health <= 10 && !fatalityMode && !fatalityAnimationActive) {
+        if (player1.health <= 10 && player2.health > 0 && !fatalityMode && !fatalityAnimationActive) {
             fatalityMode = true;
             finishHimDisplay.style.display = 'block';
             fatalitySynth.triggerAttackRelease("C4", "1s");
         }
-        if (player2.health <= 10 && !fatalityMode && !fatalityAnimationActive) {
+        if (player2.health <= 10 && player1.health > 0 && !fatalityMode && !fatalityAnimationActive) {
             fatalityMode = true;
             finishHimDisplay.style.display = 'block';
             fatalitySynth.triggerAttackRelease("C4", "1s");
@@ -651,21 +697,17 @@ window.onload = function() {
         keys[e.key.toLowerCase()] = true;
         
         if (fatalityMode && !fatalityAnimationActive) {
-            if (e.key.toLowerCase() === 'x') {
-                if (player2.health > 0) {
-                    fatalityAnimationActive = true;
-                    animationStep = 0;
-                    winner = player1;
-                    loser = player2;
-                }
+            if (e.key.toLowerCase() === 'x' && player1.health > 0 && player2.health <= 10) {
+                fatalityAnimationActive = true;
+                animationStep = 0;
+                winner = player1;
+                loser = player2;
             }
-            if (e.key.toLowerCase() === 'i') {
-                 if (player1.health > 0) {
-                    fatalityAnimationActive = true;
-                    animationStep = 0;
-                    winner = player2;
-                    loser = player1;
-                 }
+            if (e.key.toLowerCase() === 'i' && player2.health > 0 && player1.health <= 10) {
+                fatalityAnimationActive = true;
+                animationStep = 0;
+                winner = player2;
+                loser = player1;
             }
         }
     });
@@ -677,12 +719,123 @@ window.onload = function() {
     });
 
     // Set up initial and end game button handlers
-    mainButton.addEventListener('click', initGame);
+    mainButton.removeEventListener('click', showCharacterSelectionScreen);
+    mainButton.addEventListener('click', showCharacterSelectionScreen);
     controlsButton.addEventListener('click', showControlsScreen);
+    startGameButton.addEventListener('click', initGame);
+    backToHomeFromSelection.addEventListener('click', showHomeScreen);
     backToHomeFromControls.addEventListener('click', showHomeScreen);
     playAgainButton.addEventListener('click', initGame);
     backToHomeButton.addEventListener('click', showHomeScreen);
     
     // Show the home screen initially
     showHomeScreen();
+    
+    // Adicione estas variáveis no início do seu arquivo JavaScript:
+    let selectedCharacters = {
+        player1: 0, // Padrão Felipe
+        player2: 1, // Padrão Thiago
+        player1Name: '',
+        player2Name: ''
+    };
+
+    let currentPlayerSelecting = 1; // 1 para player1, 2 para player2
+
+    // Adicione esta função para configurar a seleção de personagens:
+    function setupCharacterSelection() {
+        const cards = document.querySelectorAll('.character-card');
+        const confirmBtn = document.getElementById('confirmSelectionBtn');
+        const backBtn = document.getElementById('backToHomeFromSelection');
+        
+        // Remove event listeners antigos
+        cards.forEach(card => {
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+        });
+        
+        // Adiciona novos event listeners
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const characterIndex = parseInt(card.dataset.character);
+                handleCharacterSelection(characterIndex);
+            });
+        });
+        
+        // Event listener para o botão confirmar
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                // Esconde a seleção de personagens
+                document.getElementById('characterSelectionScreenContent').style.display = 'none';
+                
+                // Aqui você chama sua função original de iniciar o jogo
+                // Substitua 'startGame()' pela sua função real
+                startGameWithSelectedCharacters();
+            });
+        }
+        
+        // Event listener para voltar
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                document.getElementById('characterSelectionScreenContent').style.display = 'none';
+                document.getElementById('homeScreenContent').style.display = 'block';
+            });
+        }
+        
+        // Atualiza a UI inicial
+        updateCharacterSelectionUI();
+    }
+
+    function handleCharacterSelection(characterIndex) {
+        if (currentPlayerSelecting === 1) {
+            selectedCharacters.player1 = characterIndex;
+            currentPlayerSelecting = 2;
+        } else {
+            selectedCharacters.player2 = characterIndex;
+            currentPlayerSelecting = 1;
+        }
+        
+        updateCharacterSelectionUI();
+    }
+
+    function updateCharacterSelectionUI() {
+        const cards = document.querySelectorAll('.character-card');
+        
+        // Reset todas as seleções
+        cards.forEach(card => {
+            card.classList.remove('player1-selected', 'player2-selected');
+            const p1Marker = card.querySelector('.selection-marker-p1');
+            const p2Marker = card.querySelector('.selection-marker-p2');
+            if (p1Marker) p1Marker.style.display = 'none';
+            if (p2Marker) p2Marker.style.display = 'none';
+        });
+        
+        // Aplica seleções atuais
+        if (selectedCharacters.player1 !== null && cards[selectedCharacters.player1]) {
+            cards[selectedCharacters.player1].classList.add('player1-selected');
+            const p1Marker = cards[selectedCharacters.player1].querySelector('.selection-marker-p1');
+            if (p1Marker) p1Marker.style.display = 'block';
+        }
+        
+        if (selectedCharacters.player2 !== null && cards[selectedCharacters.player2]) {
+            cards[selectedCharacters.player2].classList.add('player2-selected');
+            const p2Marker = cards[selectedCharacters.player2].querySelector('.selection-marker-p2');
+            if (p2Marker) p2Marker.style.display = 'block';
+        }
+        
+        // Atualiza botão de confirmação
+        const confirmBtn = document.getElementById('confirmSelectionBtn');
+        if (confirmBtn) {
+            confirmBtn.disabled = selectedCharacters.player1 === null || selectedCharacters.player2 === null;
+        }
+    }
+
+    // Esta função deve chamar sua função original de iniciar o jogo
+    function startGameWithSelectedCharacters() {
+        // Define as imagens dos personagens selecionados
+        selectedHeadP1 = characters[selectedCharacters.player1].img;
+        selectedHeadP2 = characters[selectedCharacters.player2].img;
+        
+        // Inicia o jogo original
+        initGame();
+    }
 }

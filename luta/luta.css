@@ -336,3 +336,189 @@ body {
     font-size: 12px;
     margin-right: 8px;
 }
+
+/* Character Selection Styles */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: 30px auto; /* Mudança aqui: auto para centralizar */
+    max-width: 500px;
+    justify-items: center;
+    align-items: center;
+    width: 100%; /* Adiciona width 100% */
+}
+
+.character-card {
+    position: relative;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: 3px solid #FFD700;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Press Start 2P', monospace;
+    width: 180px; /* Reduz um pouco o tamanho */
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+}
+
+.character-card.player1-selected {
+    border-color: #e74c3c;
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+
+.character-card.player2-selected {
+    border-color: #3498db;
+    background: linear-gradient(135deg, #2980b9, #3498db);
+}
+
+.character-image {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #FFD700;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+.character-name {
+    color: #FFD700;
+    font-size: 9px;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 5px;
+}
+
+.selection-marker-p1,
+.selection-marker-p2 {
+    position: absolute;
+    top: -8px;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 12px;
+    display: none;
+    z-index: 10;
+}
+
+.selection-marker-p1 {
+    left: -8px;
+    background: #e74c3c;
+    color: white;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.selection-marker-p2 {
+    right: -8px;
+    background: #3498db;
+    color: white;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Remove a duplicação do .message-container - mantenha apenas uma versão */
+/* Garante que o botão desabilitado tenha aparência correta */
+#confirmSelectionBtn:disabled {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6) !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    color: #2c3e50 !important;
+}
+
+#confirmSelectionBtn:disabled:hover {
+    transform: none !important;
+    box-shadow: 0 6px 0 #95a5a6, 0 8px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        max-width: 350px;
+    }
+    
+    .character-card {
+        width: 140px;
+        height: 130px;
+        padding: 15px;
+    }
+    
+    .character-image {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .character-name {
+        font-size: 7px;
+    }
+}
+
+/* Ajustes para o container da mensagem */
+.message-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    border: 4px solid #FFD700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 768px) {
+    .character-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        max-width: 350px;
+    }
+    
+    .character-card {
+        width: 140px;
+        height: 130px;
+        padding: 15px;
+    }
+    
+    .character-image {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .character-name {
+        font-size: 7px;
+    }
+    
+    .message-container {
+        padding: 20px;
+        max-width: 95vw;
+    }
+}
+
+/* Garante que o botão desabilitado tenha aparência correta */
+#confirmSelectionBtn:disabled {
+    background: linear-gradient(135deg, #7f8c8d, #95a5a6) !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    color: #2c3e50 !important;
+}
+
+#confirmSelectionBtn:disabled:hover {
+    transform: none !important;
+    box-shadow: 0 6px 0 #95a5a6, 0 8px 15px rgba(0, 0, 0, 0.3) !important;
+}

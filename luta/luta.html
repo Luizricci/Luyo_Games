@@ -13,7 +13,7 @@
 <body>
     <!-- Botão de voltar para o menu -->
     <div class="back-button">
-        <a href="../game_hub/game_hub.html" class="back-link">
+        <a href="../index.html" class="back-link">
             <span class="arrow">←</span> Voltar ao Menu
         </a>
     </div>
@@ -24,38 +24,68 @@
             <h2 class="home-title">MORTAL KOMBAT</h2>
             <p class="subtitle">Insira o nome dos jogadores:</p>
             <div class="input-group">
-                <input type="text" id="player1NameInput" placeholder="JOGADOR 1" maxlength="10">
-                <input type="text" id="player2NameInput" placeholder="JOGADOR 2" maxlength="10">
+                <input type="text" id="player1NameInput" placeholder="JOGADOR 1" maxlength="15">
+                <input type="text" id="player2NameInput" placeholder="JOGADOR 2" maxlength="15">
             </div>
             <div class="button-group">
-                <button id="mainButton">Começar</button>
-                <button id="controlsButton">Controles</button>
+                <button id="mainButton">JOGAR</button>
+                <button id="controlsButton">CONTROLES</button>
             </div>
         </div>
+        
+        <div id="characterSelectionScreenContent" style="display: none;">
+            <h2 class="home-title">ESCOLHA SEU LUTADOR</h2>
+            <p class="subtitle">Clique para selecionar seu personagem</p>
+            <div class="character-grid">
+                <div class="character-card" data-character="0">
+                    <img src="../public/felipe.png" alt="Felipe Dev" class="character-image">
+                    <div class="character-name">Felipe Dev</div>
+                    <div class="selection-marker-p1">P1</div>
+                    <div class="selection-marker-p2">P2</div>
+                </div>
+                <div class="character-card" data-character="1">
+                    <img src="../public/thiago.png" alt="Thiago" class="character-image">
+                    <div class="character-name">Thiago</div>
+                    <div class="selection-marker-p1">P1</div>
+                    <div class="selection-marker-p2">P2</div>
+                </div>
+                <div class="character-card" data-character="2">
+                    <img src="../public/marcelo.png" alt="Marcelo" class="character-image">
+                    <div class="character-name">Marcelo</div>
+                    <div class="selection-marker-p1">P1</div>
+                    <div class="selection-marker-p2">P2</div>
+                </div>
+                <div class="character-card" data-character="3">
+                    <img src="../public/eduardo.png" alt="Eduardo" class="character-image">
+                    <div class="character-name">Eduardo</div>
+                    <div class="selection-marker-p1">P1</div>
+                    <div class="selection-marker-p2">P2</div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="confirmSelectionBtn" disabled>COMEÇAR LUTA</button>
+                <button id="backToHomeFromSelection">VOLTAR</button>
+            </div>
+        </div>
+
         <div id="controlsScreenContent" style="display: none;">
-            <h2 class="home-title" style="text-shadow: 2px 2px #4b5563;">Controles</h2>
-            <div class="controls">
-                <div class="player-controls">
-                    <p>• Jogador 1:</p>
-                    <p>Mover: <span class="key">A, D</span></p>
-                    <p>Pular: <span class="key">W</span></p>
-                    <p>Bloquear: <span class="key">S</span></p>
-                    <p>Ataques: <span class="key">Q</span> (soco), <span class="key">E</span> (chute)</p>
-                    <p>Golpe Especial: <span class="fatality-key">X</span></p>
-                </div>
-                <div class="player-controls">
-                    <p>• Jogador 2:</p>
-                    <p>Mover: <span class="key">Setas Direcionais</span></p>
-                    <p>Pular: <span class="key">Seta para Cima</span></p>
-                    <p>Bloquear: <span class="key">Seta para Baixo</span></p>
-                    <p>Ataques: <span class="key">K</span> (soco), <span class="key">L</span> (chute)</p>
-                    <p>Golpe Especial: <span class="fatality-key">I</span></p>
-                </div>
+            <h2 class="home-title">CONTROLES</h2>
+            <div class="controls-list">
+                <p><strong>Jogador 1 (Esquerda):</strong></p>
+                <p>Movimento: W A S D</p>
+                <p>Soco: Q | Chute: E</p>
+                <p>Projetil: Z</p>
+                <hr>
+                <p><strong>Jogador 2 (Direita):</strong></p>
+                <p>Movimento: ↑ ← ↓ →</p>
+                <p>Soco: K | Chute: L</p>
+                <p>Projetil: J</p>
             </div>
             <div class="button-group">
                 <button id="backToHomeFromControls">Voltar</button>
             </div>
         </div>
+
         <div id="endGameContent" style="display: none;">
             <h2 class="home-title" id="endGameTitle"></h2>
             <div class="button-group">
@@ -86,7 +116,7 @@
                     <div id="player2StaminaBar"></div>
                 </div>
             </div>
-            </div>
+        </div>
         <canvas id="gameCanvas"></canvas>
     </div>
 
