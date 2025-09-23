@@ -301,3 +301,38 @@ body {
     from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
     to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
+
+.back-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 2000;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #FFD700;
+    text-decoration: none;
+    border-radius: 25px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border: 2px solid #FFD700;
+}
+
+.back-link:hover {
+    background-color: #FFD700;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+}
+
+.arrow {
+    font-size: 12px;
+    margin-right: 8px;
+}

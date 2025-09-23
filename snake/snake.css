@@ -131,7 +131,7 @@ canvas {
     background: none;
 }
 
-.start-button, .restart-button, .back-button {
+.start-button, .restart-button {
     font-family: 'Press Start 2P', cursive;
     font-size: 1.2em;
     padding: 10px 20px;
@@ -146,14 +146,49 @@ canvas {
     margin-top: 10px;
 }
 
-.start-button:hover, .restart-button:hover, .back-button:hover {
+.start-button:hover, .restart-button:hover{
     transform: translateY(-2px);
     box-shadow: 0 7px 0 #b8860b;
 }
 
-.start-button:active, .restart-button:active, .back-button:active {
+.start-button:active, .restart-button:active{
     transform: translateY(3px);
     box-shadow: 0 2px 0 #b8860b;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: rgba(34, 139, 34, 0.9);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid #32CD32;
+}
+
+.back-link:hover {
+    background-color: #32CD32;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(50, 205, 50, 0.4);
+}
+
+.arrow {
+    font-size: 18px;
+    margin-right: 8px;
 }
 
 .hidden {

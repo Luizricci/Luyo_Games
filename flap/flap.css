@@ -168,3 +168,36 @@ canvas {
     transform: translateY(3px);
     box-shadow: 0 2px 0 #b8860b;
 }
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.back-link:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.arrow {
+    font-size: 18px;
+    margin-right: 8px;
+}

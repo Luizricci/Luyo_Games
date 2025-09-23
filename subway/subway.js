@@ -16,7 +16,7 @@ let players = [
     { id: 2, lane: 2, x: 0, targetLane: 2, y: 0, width: 40, height: 60, color: '#ff69b4', score: 0, alive: true, character: null, selected: null }
 ];
 
-// Definindo os personagens. Mantenha os seus próprios caminhos para a pasta 'public'.
+
 const characters = [
     { name: 'Prof. Eduardo', img: new Image(), color: '#2ecc71', url: '../public/eduardo.png' },
     { name: 'Prof. Felipe', img: new Image(), color: '#e67e22', url: '../public/felipe.png' },
@@ -24,12 +24,12 @@ const characters = [
     { name: 'Prof. Thiago', img: new Image(), color: '#3498db', url: '../public/thiago.png' },
 ];
 
-// Pré-carregando as imagens dos personagens
+
 characters.forEach(char => {
     char.img.src = char.url;
 });
 
-// Carregando a imagem da moeda. Substitua o caminho abaixo para a sua imagem.
+
 const coinImage = new Image();
 coinImage.src = 'https://cdn.pixabay.com/photo/2017/08/05/11/16/logo-2582748_1280.png';
 
@@ -48,7 +48,7 @@ const MAX_TRAIN_WIDTH = 120;
 const MIN_TRAIN_HEIGHT = 150;
 const MAX_TRAIN_HEIGHT = 250;
 
-// Redimensionar canvas e posição dos jogadores
+
 function resizeCanvas() {
     const width = Math.min(window.innerWidth * 0.9, 500);
     const height = Math.min(window.innerHeight * 0.8, 700);
@@ -71,7 +71,6 @@ function getLaneX(lane) {
     return lane * laneWidth + laneWidth / 2;
 }
 
-// Desenha os personagens com imagens
 function drawPlayers() {
     players.forEach(player => {
         if (player.alive && player.character) {
@@ -80,17 +79,17 @@ function drawPlayers() {
     });
 }
 
-// Função para desenhar a estrada
+
 function drawRoad() {
-    ctx.fillStyle = '#424242'; // Cor do asfalto
+    ctx.fillStyle = '#424242';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const laneWidth = canvas.width / 3;
-    ctx.fillStyle = '#f1c40f'; // Amarelo
+    ctx.fillStyle = '#f1c40f'; 
     ctx.fillRect(laneWidth - 5, 0, 10, canvas.height);
     ctx.fillRect(laneWidth * 2 - 5, 0, 10, canvas.height);
 
-    const roadLineColor = '#fff'; // Branco
+    const roadLineColor = '#fff'; 
     const roadLineWidth = 5;
     const roadLineLength = 40;
     const roadLineSpacing = 60;
@@ -105,7 +104,7 @@ function drawRoad() {
     }
 }
 
-// Função para desenhar um trem
+
 function drawTrain(train) {
     const x = getLaneX(train.lane) - train.width / 2;
     const y = train.y;
@@ -131,14 +130,14 @@ function drawTrain(train) {
     ctx.fill();
 }
 
-// Desenha os diferentes tipos de obstáculos
+
 function drawObstacles() {
     obstacles.forEach(obstacle => {
         drawTrain(obstacle);
     });
 }
 
-// Desenha as moedas com a nova imagem
+
 function drawCoins() {
     coins.forEach(coin => {
         ctx.drawImage(coinImage, getLaneX(coin.lane) - coin.width / 2, coin.y, coin.width, coin.height);
