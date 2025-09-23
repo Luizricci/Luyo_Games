@@ -148,10 +148,8 @@ function updateGameObjects() {
     const now = Date.now();
     
     const totalScore = players[0].score + players[1].score;
-    gameSpeed = baseSpeed + (totalScore * 0.01); 
-    
-    const maxSpeed = baseSpeed * 3; 
-    gameSpeed = Math.min(gameSpeed, maxSpeed);
+    // Progressão levemente mais rápida e sem limite superior
+    gameSpeed = baseSpeed + (totalScore * 0.07);
     
     roadOffset = (roadOffset + gameSpeed) % (60 + 40);
 
