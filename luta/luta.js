@@ -138,6 +138,7 @@ window.onload = function() {
             this.direction = direction;
             this.isPunching = false;
             this.isKicking = false;
+            this.isCrouching = false;
             
             // Carrega a imagem da cabeça se um caminho for fornecido
             this.headImage = new Image();
@@ -164,19 +165,22 @@ window.onload = function() {
             const baseX = this.direction === 'right' ? this.x : this.x + this.width;
             const xScale = this.direction === 'right' ? 1 : -1;
 
+            // Mantemos o pé no chão e baixamos o topo do corpo via ajustes internos
+            const crouchOffset = 0;
             ctx.save();
-            ctx.translate(baseX, this.y);
+            ctx.translate(baseX, this.y + crouchOffset);
             ctx.scale(xScale, 1);
 
-            // *** CÓDIGO MODIFICADO: Posição da cabeça ajustada ***
+            // *** CÓDIGO MODIFICADO: Posição da cabeça ajustada (+6px para cima) ***
             // Head (draw image if available, otherwise draw circle)
             if (this.headImage && this.headImage.complete) {
-                // Posição Y da imagem da cabeça movida de 0 para -5
-                ctx.drawImage(this.headImage, this.width / 2 - 25, -5, 50, 50);
+                // Cabeça bem mais baixa quando agachado
+                const headY = this.isCrouching ? 10 : -5;
+                ctx.drawImage(this.headImage, this.width / 2 - 25, headY, 50, 50);
             } else {
                 ctx.beginPath();
-                // Posição Y do centro do círculo movida de 15 para 10
-                ctx.arc(this.width / 2, 10, 15, 0, Math.PI * 2);
+                const headCY = this.isCrouching ? 14 : 4;
+                ctx.arc(this.width / 2, headCY, 15, 0, Math.PI * 2);
                 ctx.fillStyle = this.bodyColor;
                 ctx.fill();
             }
@@ -184,7 +188,9 @@ window.onload = function() {
             // *** CÓDIGO MODIFICADO: Posição do tronco ajustada ***
             // Trunk - Posição Y movida de 35 para 30 para se conectar à cabeça
             ctx.fillStyle = this.trunkColor;
-            ctx.fillRect(this.width / 4, 40, this.width / 2, this.height * 0.4);
+            const trunkHeight = (this.height * 0.4) - (this.isCrouching ? 30 : 0);
+            const trunkY = this.isCrouching ? 65 : 40; // tronco bem mais baixo quando agachado
+            ctx.fillRect(this.width / 4, trunkY, this.width / 2, trunkHeight);
 
             // Arms
             ctx.fillStyle = this.bodyColor;
@@ -198,8 +204,9 @@ window.onload = function() {
                 ctx.fillRect(this.width / 4 - 5, this.height * 0.35, 10, this.height * 0.2);
             } else {
                 // Braços normais
-                ctx.fillRect(this.width / 4, this.height * 0.35, 10, this.height * 0.3);
-                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.35, 10, this.height * 0.3);
+                const armYOffset = this.isCrouching ? 26 : 0;
+                ctx.fillRect(this.width / 4, this.height * 0.35 + armYOffset, 10, this.height * 0.3 - armYOffset);
+                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.35 + armYOffset, 10, this.height * 0.3 - armYOffset);
             }
 
             // Legs
@@ -224,9 +231,35 @@ window.onload = function() {
                 ctx.stroke();
 
             } else {
-                // Pernas normais
-                ctx.fillRect(this.width * 0.25, this.height * 0.75, 10, this.height * 0.25);
-                ctx.fillRect(this.width * 0.75 - 10, this.height * 0.75, 10, this.height * 0.25);
+                if (this.isCrouching) {
+                    // Pernas dobradas (joelhos) mantendo os pés no chão
+                    ctx.lineWidth = 10;
+                    ctx.strokeStyle = this.pantsColor;
+                    // Perna esquerda
+                    const hipL = { x: this.width * 0.35, y: this.height * 0.75 };
+                    const kneeL = { x: hipL.x - 10, y: this.height * 0.88 };
+                    const footL = { x: kneeL.x - 6, y: this.height };
+                    ctx.beginPath();
+                    ctx.moveTo(hipL.x, hipL.y);
+                    ctx.lineTo(kneeL.x, kneeL.y);
+                    ctx.lineTo(footL.x, footL.y);
+                    ctx.stroke();
+                    // Perna direita
+                    const hipR = { x: this.width * 0.75 - 10, y: this.height * 0.75 };
+                    const kneeR = { x: hipR.x + 10, y: this.height * 0.88 };
+                    const footR = { x: kneeR.x + 6, y: this.height };
+                    ctx.beginPath();
+                    ctx.moveTo(hipR.x, hipR.y);
+                    ctx.lineTo(kneeR.x, kneeR.y);
+                    ctx.lineTo(footR.x, footR.y);
+                    ctx.stroke();
+                } else {
+                    // Pernas normais em pé
+                    const legYOffset = 0;
+                    const legHeight = this.height * 0.25;
+                    ctx.fillRect(this.width * 0.25, this.height * 0.75 + legYOffset, 10, legHeight);
+                    ctx.fillRect(this.width * 0.75 - 10, this.height * 0.75 + legYOffset, 10, legHeight);
+                }
             }
             
             ctx.restore();
@@ -279,6 +312,7 @@ window.onload = function() {
         }
         
         jump() {
+            if (this.isCrouching) return; // não pula agachado
             let onGround = this.y + this.height >= groundY;
             let onPlatform = platforms.some(platform => 
                 this.y + this.height === platform.y &&
@@ -290,6 +324,17 @@ window.onload = function() {
                 this.velocity.y = jumpPower;
                 this.isJumping = true;
             }
+        }
+
+        // Retorna a hitbox efetiva, considerando agachado
+        getHitbox() {
+            const crouchReduction = this.isCrouching ? 48 : 0;
+            return {
+                x: this.x,
+                y: this.y + crouchReduction,
+                width: this.width,
+                height: this.height - crouchReduction
+            };
         }
 
         takeHit(damage) {
@@ -315,7 +360,9 @@ window.onload = function() {
                     this.isAttacking = false;
                     this.isPunching = false;
                 }, 200);
-                return { damage: 10, range: 40, yOffset: 60, height: 10, width: 40 };
+                // Hitbox mais curta para evitar acertos de longe
+                const crouchAdjust = this.isCrouching ? 40 : 0;
+                return { damage: 10, range: 30, yOffset: 60 + crouchAdjust, height: 12, width: 24 };
             }
             return null;
         }
@@ -330,7 +377,9 @@ window.onload = function() {
                     this.isAttacking = false;
                     this.isKicking = false;
                 }, 200);
-                return { damage: 15, range: 60, yOffset: 120, height: 15, width: 80 };
+                // Hitbox mais curta para evitar acertos de longe
+                const crouchAdjust = this.isCrouching ? 45 : 0;
+                return { damage: 15, range: 35, yOffset: 120 + crouchAdjust, height: 14, width: 36 };
             }
             return null;
         }
@@ -478,7 +527,7 @@ window.onload = function() {
             playerColor: getComputedStyle(document.documentElement).getPropertyValue('--player1-color'),
             trunkColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-trunk-color'),
             pantsColor: getComputedStyle(document.documentElement).getPropertyValue('--p1-pants-color'),
-            keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'q', kick: 'e', fireball: 'z' },
+            keysConfig: { left: 'a', right: 'd', jump: 'w', block: 's', punch: 'r', kick: 't', fireball: 'z' },
             direction: 'right',
             name: selectedCharacters.player1Name || player1NameInput.value.trim() || 'JOGADOR 1',
             headImagePath: selectedHeadP1
@@ -751,24 +800,30 @@ window.onload = function() {
             player1.isBlocking = keys[player1.keysConfig.block];
             player2.isBlocking = keys[player2.keysConfig.block];
 
+            // Crouch (agachar) - S para P1 e ArrowDown para P2
+            player1.isCrouching = !!keys[player1.keysConfig.block];
+            player2.isCrouching = !!keys[player2.keysConfig.block];
+
+            // Movimentação reduzida quando agachado
+            const p1Move = player1.isCrouching ? moveSpeed * 0.5 : moveSpeed;
+            const p2Move = player2.isCrouching ? moveSpeed * 0.5 : moveSpeed;
+
             if (keys[player1.keysConfig.left]) { 
-                player1.velocity.x = -moveSpeed; 
+                player1.velocity.x = -p1Move; 
                 player1.direction = 'left'; 
             }
             if (keys[player1.keysConfig.right]) { 
-                player1.velocity.x = moveSpeed; 
+                player1.velocity.x = p1Move; 
                 player1.direction = 'right'; 
             }
             if (keys[player1.keysConfig.jump]) { player1.jump(); }
 
             if (keys[player2.keysConfig.left]) { 
-                console.log('Moving player2 left - keys object:', keys);
-                player2.velocity.x = -moveSpeed; 
+                player2.velocity.x = -p2Move; 
                 player2.direction = 'left'; 
             }
             if (keys[player2.keysConfig.right]) { 
-                console.log('Moving player2 right - keys object:', keys);
-                player2.velocity.x = moveSpeed; 
+                player2.velocity.x = p2Move; 
                 player2.direction = 'right'; 
             }
             if (keys[player2.keysConfig.jump]) { player2.jump(); }
@@ -778,15 +833,25 @@ window.onload = function() {
             
             // Check attack collision
             const checkCollision = (attacker, defender, attack) => {
-                // Calcula a posição de ataque com base na direção do atacante
-                const attackX = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x - attack.width;
+                // Usa hitbox efetiva do defensor (considera crouch)
+                const def = defender.getHitbox();
+                // Janela vertical do golpe
                 const attackY = attacker.y + attack.yOffset;
-                if (
-                    attackX + attack.width >= defender.x &&
-                    attackX <= defender.x + defender.width &&
-                    attackY + attack.height >= defender.y &&
-                    attackY <= defender.y + defender.height
-                ) {
+                const verticalOverlap =
+                    attackY + attack.height >= def.y &&
+                    attackY <= def.y + def.height;
+
+                if (!verticalOverlap) return;
+
+                // Distância horizontal entre a frente do atacante e a frente do defensor
+                const attackerFront = attacker.direction === 'right' ? attacker.x + attacker.width : attacker.x;
+                const defenderFront = attacker.direction === 'right' ? def.x : def.x + def.width;
+                const horizontalGap = attacker.direction === 'right'
+                    ? defenderFront - attackerFront
+                    : attackerFront - defenderFront;
+
+                // Só conta se o defensor estiver à frente e dentro do alcance declarado
+                if (horizontalGap >= 0 && horizontalGap <= attack.range) {
                     defender.takeHit(attack.damage);
                 }
             };
@@ -815,11 +880,12 @@ window.onload = function() {
             projectiles.forEach((p, index) => {
                 p.update();
                 const opponent = p.owner === player1 ? player2 : player1;
+                const def = opponent.getHitbox();
                 if (
-                    p.x + p.width >= opponent.x &&
-                    p.x <= opponent.x + opponent.width &&
-                    p.y + p.height >= opponent.y &&
-                    p.y <= opponent.y + opponent.height
+                    p.x + p.width >= def.x &&
+                    p.x <= def.x + def.width &&
+                    p.y + p.height >= def.y &&
+                    p.y <= def.y + def.height
                 ) {
                     if (!p.isHit) {
                         opponent.takeHit(25);
